@@ -1,6 +1,5 @@
 {
   "name": "iosignal-vanilla-chat",
-  "private": true,
   "version": "1.0.0",
   "description": "",
   "main": "main.js",

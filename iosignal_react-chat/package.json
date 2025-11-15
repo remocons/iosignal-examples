@@ -1,6 +1,5 @@
 {
-  "name": "react-chat-js",
-  "private": true,
+  "name": "iosignal-react-chat",
   "version": "1.0.0",
   "type": "module",
   "scripts": {

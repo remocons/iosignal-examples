@@ -1,6 +1,5 @@
 {
-	"name": "svelte-chat-js",
-	"private": true,
+	"name": "iosignal-svelte-chat",
 	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
