@@ -20,11 +20,7 @@
   };
 
   if (browser) {
-      let wsURL = new URL( document.URL )
-      wsURL.protocol = 'ws'
-      console.log( 'ws url:', wsURL.href)
 
-    // io = new IO(wsURL.href);
     io = new IO(url);
     if (dev)
       console.log("new io:", IO.version, IO.instanceCount, IO.webSocketCount);
@@ -43,8 +39,10 @@
     };
 
     const handleChannelMessage = (tag, msgObj ) => {
-      messages = [...messages, `${msgObj.cid} : ${msgObj.text}`];
-      scrollToBottom();
+      if( tag == channel_tag ){
+        messages = [...messages, `${msgObj.cid} : ${msgObj.text}`];
+        scrollToBottom();
+      }
     };
 
     const handleError = (error) => {
@@ -54,7 +52,7 @@
 
     io.on("ready", handleReady);
     io.on("change", handleChange);
-    io.on(channel_tag, handleChannelMessage);
+    io.on("message", handleChannelMessage);
     io.on("error", handleError);
 
     $effect(() => {

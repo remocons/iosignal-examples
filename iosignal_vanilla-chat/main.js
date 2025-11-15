@@ -14,6 +14,7 @@ const websocketsDisplay = document.getElementById('ws-created');
 const messagesContainer = document.getElementById('messages');
 const messageInput = document.getElementById('input');
 const sendButton = document.getElementById('send-button');
+messageInput.value = 'Hello, World';
 
 let io = null;
 
@@ -47,13 +48,15 @@ const handleChange = (state) => {
 };
 
 const handleChannelMessage = (tag, msgObj) => {
-    if (typeof msgObj === 'string') {
-        msgObj = { text: msgObj, cid: 'cid unknown' };
+    if( tag == channel_tag){
+        if (typeof msgObj === 'string') {
+            msgObj = { text: msgObj, cid: 'cid unknown' };
+        }
+        const messageElement = document.createElement('div');
+        messageElement.textContent = `${msgObj.cid} : ${msgObj.text}`;
+        messagesContainer.appendChild(messageElement);
+        scrollToBottom();
     }
-    const messageElement = document.createElement('div');
-    messageElement.textContent = `${msgObj.cid} : ${msgObj.text}`;
-    messagesContainer.appendChild(messageElement);
-    scrollToBottom();
 };
 
 const handleError = (error) => {
@@ -84,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     io.on('ready', handleReady);
     io.on('change', handleChange);
-    io.on(channel_tag, handleChannelMessage);
+    io.on('message', handleChannelMessage);
     io.on('error', handleError);
 
     sendButton.addEventListener('click', sendMessage);

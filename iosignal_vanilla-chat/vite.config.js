@@ -1,26 +1,24 @@
 import { defineConfig } from 'vite';
-import { Server } from 'iosignal'
+import { Server, version } from 'iosignal'
 
-export default {
+export default defineConfig({
   plugins: [
     {
       name: 'iosignal-server',
 
       configureServer() {
+        
         let s = new Server({
-          port:7777, congPort:8888,
+          port: 7777,
           showMessage: 'message'
         })
         s.on('ready',()=>{
-          console.log('iosignal server listening port :', s.port, s.congPort )
+          console.log(`iosignal server ${version} listening port : ${s.port}`)
         })
 
       }
     },
   ],
-};
-
-
-
+});
 
 

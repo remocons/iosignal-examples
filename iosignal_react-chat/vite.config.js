@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { Server } from 'iosignal'
+import { Server, version } from 'iosignal'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -14,7 +14,7 @@ export default defineConfig({
         showMessage: 'message'
       })
       s.on('ready', () => {
-        console.log('iosignal server listening port :', s.port)
+        console.log(`iosignal server ${version} listening port : ${s.port}`)
       })
 
     }

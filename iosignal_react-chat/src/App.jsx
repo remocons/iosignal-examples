@@ -45,10 +45,12 @@ function App() {
     };
 
     const handleChannelMessage = (tag, msgObj ) => {
-      if( typeof msgObj === 'string' ) {
-        msgObj = { text: msgObj, cid: 'cid unknown' }; // Convert string to object if necessary
+      if(tag == channel_tag){
+        if( typeof msgObj === 'string' ) {
+          msgObj = { text: msgObj, cid: 'cid unknown' }; // Convert string to object if necessary
+        }
+        setMessages((prevMessages) => [...prevMessages, `${msgObj.cid} : ${msgObj.text}`]); // Update messages state]);
       }
-      setMessages((prevMessages) => [...prevMessages, `${msgObj.cid} : ${msgObj.text}`]); // Update messages state]);
     };
 
     const handleError = (error) => {
@@ -58,7 +60,7 @@ function App() {
 
     ioRef.current.on('ready', handleReady);
     ioRef.current.on('change', handleChange);
-    ioRef.current.on(channel_tag, handleChannelMessage); // Add channel message listener
+    ioRef.current.on('message', handleChannelMessage);
     ioRef.current.on('error', handleError);
 
 

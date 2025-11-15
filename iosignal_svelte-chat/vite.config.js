@@ -1,6 +1,6 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
-import { Server } from 'iosignal'
+import { Server, version} from 'iosignal'
 
 export default defineConfig({
 	plugins: [
@@ -14,7 +14,7 @@ export default defineConfig({
 					showMessage: 'message'
 				})
 				s.on('ready', () => {
-					console.log('iosignal server listening port :', s.port)
+		        console.log(`iosignal server ${version} listening port : ${s.port}`)
 				})
 
 			}
