@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vanilla JS Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app" class="App">
+        <h1>IOSignal Vanilla JS Chat Example</h1>
+        <div>URL: <span id="url"></span></div>
+        <div>Channel: <span id="channel"></span></div>
+        <div>IO State: <span id="io-state"></span></div>
+        <div>Client ID: <span id="cid"></span></div>
+        <div>IO Instances: <span id="io-instances"></span></div>
+        <div>WebSockets Created: <span id="ws-created"></span></div>
+        <div id="messages" class="messages"></div>
+        <div class="input-area">
+            <input type="text" id="input" />
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
