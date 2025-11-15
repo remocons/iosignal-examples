@@ -1,0 +1,61 @@
+html, body, #root, .App {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.App {
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+h1 {
+  margin-top: 0;
+  color: #333;
+}
+
+.messages {
+  flex-grow: 1; /* 남은 공간을 모두 차지하도록 설정 */
+  border: 1px solid #ccc;
+  padding: 10px;
+  overflow-y: auto; /* 내용이 넘치면 스크롤바 표시 */
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column; /* 메시지를 아래에서 위로 쌓이도록 */
+  justify-content: flex-end; /* 메시지를 아래로 정렬 */
+}
+
+.messages div {
+  background-color: #f0f0f0;
+  padding: 8px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  text-align: left;
+}
+
+.input-area {
+  display: flex;
+  gap: 10px;
+  margin-top: auto; /* 항상 하단에 위치하도록 */
+}
+
+.input-area input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.input-area button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.input-area button:hover {
+  background-color: #0056b3;
+}
