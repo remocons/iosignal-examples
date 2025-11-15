@@ -18,6 +18,6 @@
 	},
 	"dependencies": {
 		"@sveltejs/adapter-static": "^3.0.10",
-		"iosignal": "^4.6.0"
+		"iosignal": "^4.6.1"
 	}
 }
