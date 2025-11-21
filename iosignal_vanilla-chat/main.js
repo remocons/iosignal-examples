@@ -48,7 +48,7 @@ const handleChange = (state) => {
 };
 
 const handleChannelMessage = (tag, msgObj) => {
-    if( tag == channel_tag){
+    if( tag == channel_tag && msgObj){
         if (typeof msgObj === 'string') {
             msgObj = { text: msgObj, cid: 'cid unknown' };
         }

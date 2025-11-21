@@ -39,7 +39,10 @@
     };
 
     const handleChannelMessage = (tag, msgObj ) => {
-      if( tag == channel_tag ){
+      if( tag == channel_tag && msgObj){
+        if( typeof msgObj === 'string' ) {
+          msgObj = { text: msgObj, cid: 'cid unknown' }; // Convert string to object if necessary
+        }
         messages = [...messages, `${msgObj.cid} : ${msgObj.text}`];
         scrollToBottom();
       }
