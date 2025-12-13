@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "iosignal": "^5.0.1",
+    "iosignal": "^5.1.1",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"
   },
