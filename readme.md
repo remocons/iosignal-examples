@@ -19,8 +19,3 @@
 - vanilla js client app
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remocons/iosignal-examples/tree/main/iosignal_vanilla-chat)
-
-
-[![Open in StackBlitz test](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remocons/iosignal-examples/tree/main/iosignal_vanilla-chat?file=index.html&terminal=dev)
-
-
