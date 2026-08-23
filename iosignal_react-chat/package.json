@@ -13,12 +13,12 @@
     "startCommand": "npm run sb:start"
   },
   "dependencies": {
-    "iosignal": "^5.1.1",
+    "iosignal": "^5.1.4",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.0.1",
-    "vite": "^7.1.3"
+    "vite": "^8.2.2"
   }
 }
