@@ -1,4 +1,4 @@
-import IO from 'iosignal/io.js'
+import IO from 'iosignal/browser/esm/io.js'
 
 
 const url = 'ws://localhost:7777';

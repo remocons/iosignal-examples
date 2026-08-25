@@ -14,14 +14,13 @@
 		"startCommand": "npm run sb:start"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "^7.0.1",
+		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.63.0",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"svelte": "^5.56.1",
 		"vite": "^8.0.16"
 	},
 	"dependencies": {
-		"@sveltejs/adapter-static": "^3.0.10",
-		"iosignal": "^5.1.4"
+		"iosignal": "^5.2.0"
 	}
 }

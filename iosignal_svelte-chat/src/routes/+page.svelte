@@ -1,6 +1,6 @@
 <script>
   import { dev, browser } from "$app/environment";
-  import IO from "iosignal/io.js";
+  import IO from "iosignal/browser/esm/io.js";
 
   // const url = 'ws://192.168.0.15:7777';
   // const url = "wss://io.iosignal.net/ws";
