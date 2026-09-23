@@ -9,6 +9,9 @@
     "start": "vite",
     "sb:start": "npm install && npm run start"
   },
+  "stackblitz": {
+    "startCommand": "npm run sb:start"
+  },
     "devDependencies": {
       "vite": "^8.2.2"
   },
