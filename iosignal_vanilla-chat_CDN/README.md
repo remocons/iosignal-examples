@@ -1,6 +1,7 @@
 # IOSignal examples
 
-## vanilla-chat via CDN
-- vanilla js client app
-- no bundler , use CDN ( importmap )
 
+## vanilla-chat via CDN
+
+- Using the Browser Client via CDN
+- vite & iosignal server
