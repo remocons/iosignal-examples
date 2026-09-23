@@ -1,7 +1,6 @@
-import IO from 'iosignal/browser/esm/io.js';
+import IO from "https://cdn.jsdelivr.net/npm/iosignal@5.2.0/dist/browser/esm/io.js" 
 
-// const url = 'ws://localhost:7777';
-const url = 'wss://io.iosignal.net/ws';
+const url = 'ws://localhost:7777';
 const channel_tag = 'openchat';
 
 // Get DOM elements

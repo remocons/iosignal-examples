@@ -1,0 +1,12 @@
+{
+  "type": "module",
+  "devDependencies": {
+    "vite": "^8.3.0"
+  },
+  "scripts": {
+    "dev": "vite"
+  },
+  "dependencies": {
+    "iosignal": "^5.2.0"
+  }
+}
