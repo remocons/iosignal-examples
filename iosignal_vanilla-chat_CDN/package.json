@@ -3,19 +3,24 @@
   "version": "1.0.1",
   "description": "",
   "type": "module",
-
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "sb:start": "npm install && npm run start"
+    "sb:start": "npm install && npm run start",
+    "server": "node server.js",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "stackblitz": {
     "startCommand": "npm run sb:start"
   },
-    "devDependencies": {
-      "vite": "^8.2.2"
+  "devDependencies": {
+    "vite": "^8.2.2"
   },
   "dependencies": {
-    "iosignal": "^5.2.0"
+    "iosignal": "^5.3.0"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
   }
 }

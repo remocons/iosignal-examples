@@ -25,18 +25,14 @@ function App() {
 
   useEffect(() => {
     console.log(IO.version)
-    ioRef.current = new IO(url); // Create io instance with URL
-    setCounts({ instances: IO.instanceCount, websockets: IO.webSocketCount }); // Set initial counts
-
-    if (!ioRef.current) {
-      console.error('IO instance is not initialized.');
-      return;
-    }
+    const io = new IO();
+    ioRef.current = io;
+    setCounts({ instances: IO.instanceCount, websockets: IO.webSocketCount });
 
     const handleReady = () => {
-      console.log('ready cid:', ioRef.current.cid);
-      setCid(ioRef.current.cid); // Update cid state
-      ioRef.current.subscribe(channel_tag); // Subscribe to channel
+      console.log('ready cid:', io.cid);
+      setCid(io.cid); // Update cid state
+      io.subscribe(channel_tag); // Subscribe to channel
     };
 
     const handleChange = (state) => {
@@ -58,28 +54,29 @@ function App() {
       setIoState(`Error: ${error.message}`);
     };
 
-    ioRef.current.on('ready', handleReady);
-    ioRef.current.on('change', handleChange);
-    ioRef.current.on('message', handleChannelMessage);
-    ioRef.current.on('error', handleError);
+    io.on('ready', handleReady);
+    io.on('change', handleChange);
+    io.on('message', handleChannelMessage);
+    io.on('error', handleError);
+    io.open(url);
 
 
     // Cleanup function: remove event listeners when component unmounts
     return () => {
-      ioRef.current.off('ready', handleReady);
-      ioRef.current.off('change', handleChange);
-      ioRef.current.off(channel_tag, handleChannelMessage);
-      ioRef.current.off('error', handleError);
+      io.off('ready', handleReady);
+      io.off('change', handleChange);
+      io.off('message', handleChannelMessage);
+      io.off('error', handleError);
  
       // destroy() is called to clean up the io instance, all listeners are removed automatically
-      ioRef.current.destroy(); // Clean up the io instance
+      io.destroy(); // Clean up the io instance
       console.log('IO instance destroyed.');
       ioRef.current = null; // Release the io instance reference
     };
   }, []); // Empty dependency array ensures this runs only once on mount
 
   const sendMessage = () => {
-    if (input.trim()) {
+    if (input.trim() && ioRef.current?.stateName === 'ready') {
       const msgObj = { text: input, cid: ioRef.current.cid };
       // console.log('Sending message object:', msgObj);
       ioRef.current.signal(channel_tag, msgObj); // Send message to channel
@@ -97,18 +94,19 @@ function App() {
       <h1>IOSignal React Chat Example</h1>
       <div>URL: {url}</div>
       <div>Channel: {channel_tag}</div>
-      <div>IO State: <span style={ioStateStyle}>{ioState}</span></div>
+      <div>IO State: <span style={ioStateStyle} role="status">{ioState}</span></div>
       <div>Client ID: {cid}</div>
       <div>IO Instances: {counts.instances}</div>
       <div>WebSockets Created: {counts.websockets}</div>
-      <div className="messages">
+      <div className="messages" role="log" aria-label="Chat messages" tabIndex={0}>
         {messages.map((msg, index) => (
           <div key={index}>{msg}</div>
         ))}
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} aria-hidden="true" />
       </div>
       <div className="input-area">
         <input
+          aria-label="Message"
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}

@@ -1,10 +1,11 @@
 <script>
-  import { dev, browser } from "$app/environment";
+  import { dev } from "$app/environment";
+  import { onMount, tick } from "svelte";
   import IO from "iosignal/browser/esm/io.js";
 
-  // const url = 'ws://192.168.0.15:7777';
+  // const url = 'ws://192.168.0.15:7778';
   // const url = "wss://io.iosignal.net/ws";
-  const url = "ws://localhost:7777";
+  const url = "ws://localhost:7778";
   const channel_tag = "openchat";
 
   let messages = $state([]);
@@ -19,9 +20,9 @@
     messagesEnd?.scrollIntoView({ behavior: "smooth" });
   };
 
-  if (browser) {
+  onMount(() => {
 
-    io = new IO(url);
+    io = new IO();
     if (dev)
       console.log("new io:", IO.version, IO.instanceCount, IO.webSocketCount);
 
@@ -38,12 +39,13 @@
       counts = { instances: IO.instanceCount, websockets: IO.webSocketCount };
     };
 
-    const handleChannelMessage = (tag, msgObj ) => {
+    const handleChannelMessage = async (tag, msgObj ) => {
       if( tag == channel_tag && msgObj){
         if( typeof msgObj === 'string' ) {
           msgObj = { text: msgObj, cid: 'cid unknown' }; // Convert string to object if necessary
         }
         messages = [...messages, `${msgObj.cid} : ${msgObj.text}`];
+        await tick();
         scrollToBottom();
       }
     };
@@ -58,16 +60,16 @@
     io.on("message", handleChannelMessage);
     io.on("error", handleError);
 
-    $effect(() => {
-      return () => {
-        io.destroy();
-        io = null;
-      };
-    });
-  }
+    io.open(url);
+
+    return () => {
+      io.destroy();
+      io = null;
+    };
+  });
 
   const sendMessage = () => {
-    if (input.trim()) {
+    if (input.trim() && io?.stateName === 'ready') {
       const msgObj = { text: input, cid: io.cid };
       io.signal(channel_tag, msgObj);
       input = ''
@@ -79,22 +81,25 @@
   );
 </script>
 
+<svelte:head><title>IOSignal Svelte Chat</title></svelte:head>
+
 <div class="App">
   <h1>IOSignal Svelte 5 Chat Example</h1>
   <div>URL: {url}</div>
   <div>Channel: {channel_tag}</div>
-  <div>IO State: <span style={ioStateStyle}>{ioState}</span></div>
+  <div>IO State: <span style={ioStateStyle} role="status">{ioState}</span></div>
   <div>Client ID: {cid}</div>
   <div>IO Instances: {counts.instances}</div>
   <div>WebSockets Created: {counts.websockets}</div>
-  <div class="messages">
+  <div class="messages" role="log" aria-label="Chat messages">
     {#each messages as msg, index (index)}
       <div>{msg}</div>
     {/each}
-    <div bind:this={messagesEnd}></div>
+    <div bind:this={messagesEnd} aria-hidden="true"></div>
   </div>
   <div class="input-area">
     <input
+      aria-label="Message"
       type="text"
       bind:value={input}
       onkeyup={(e) => e.key === "Enter" && sendMessage()}
@@ -120,17 +125,17 @@
   }
 
   .messages {
-    flex-grow: 1;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-wrap: anywhere;
     border: 1px solid #ccc;
     padding: 10px;
     overflow-y: auto;
     margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
     justify-content: flex-end;
   }
 
-  .messages div {
+  .messages > div:not([aria-hidden]) {
     background-color: #f0f0f0;
     padding: 8px;
     margin-bottom: 5px;
@@ -146,6 +151,7 @@
 
   .input-area input {
     flex-grow: 1;
+    min-width: 0;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;

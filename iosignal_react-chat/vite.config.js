@@ -1,23 +1,34 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { Server, version } from 'iosignal'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { Server, version } from 'iosignal';
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react(),
-  {
+// Keep each example self-contained: Vite starts and stops its chat server.
+function iosignalServer() {
+  let server;
+  let closing;
+
+  return {
     name: 'iosignal-server',
-
     configureServer() {
-      let s = new Server({
+      closing = undefined;
+      server = new Server({
         port: 7777,
-        showMessage: 'message'
-      })
-      s.on('ready', () => {
-        console.log(`iosignal server ${version} listening port : ${s.port}`)
-      })
+        showMessage: 'message',
+      });
+      server.on('ready', () => {
+        console.log(`iosignal server ${version} listening port : ${server.port}`);
+      });
+    },
+    closeBundle() {
+      // Vite awaits this hook on shutdown and before restarting the server.
+      if (!server) return;
+      closing ??= new Promise((resolve) => server.close(resolve));
+      return closing;
+    },
+  };
+}
 
-    }
-  },
-  ],
-})
+export default defineConfig({
+  server: { port: 5173, strictPort: true },
+  plugins: [react(), iosignalServer()],
+});

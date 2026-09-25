@@ -1,6 +1,6 @@
-import IO from "https://cdn.jsdelivr.net/npm/iosignal@5.2.0/dist/browser/esm/io.js" 
+import IO from "https://cdn.jsdelivr.net/npm/iosignal@5.3.0/dist/browser/esm/io.js"
 
-const url = 'ws://localhost:7777';
+const url = 'ws://localhost:7780';
 const channel_tag = 'openchat';
 
 // Get DOM elements
@@ -68,40 +68,45 @@ const handleError = (error) => {
 
 const sendMessage = () => {
     const inputText = messageInput.value.trim();
-    if (inputText && io && io.cid) {
+    if (inputText && io?.stateName === 'ready') {
         const msgObj = { text: inputText, cid: io.cid };
         io.signal(channel_tag, msgObj);
         messageInput.value = '';
     }
 };
 
-// Initialize on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
+const handleKeyUp = (event) => {
+    if (event.key === 'Enter') sendMessage();
+};
+
+function initialize() {
     urlDisplay.textContent = url;
     channelDisplay.textContent = channel_tag;
-
-    io = new IO(url);
-    console.log('IO instance created:', IO.version, IO.instanceCount, IO.webSocketCount);
-    updateIoCounts();
-
+    io = new IO();
     io.on('ready', handleReady);
     io.on('change', handleChange);
     io.on('message', handleChannelMessage);
     io.on('error', handleError);
-
+    io.open(url);
+    updateIoCounts();
     sendButton.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
+    messageInput.addEventListener('keyup', handleKeyUp);
+}
 
-    // Cleanup on page unload
-    window.addEventListener('beforeunload', () => {
-        if (io) {
-            io.destroy();
-            console.log('IO instance destroyed.');
-            io = null;
-        }
-    });
-});
+function cleanup() {
+    document.removeEventListener('DOMContentLoaded', initialize);
+    sendButton.removeEventListener('click', sendMessage);
+    messageInput.removeEventListener('keyup', handleKeyUp);
+    window.removeEventListener('beforeunload', cleanup);
+    io?.destroy(); // destroy() removes the IO event listeners as well.
+    io = null;
+}
+
+// Module scripts normally run after the DOM is parsed; HMR can run later.
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initialize, { once: true });
+} else {
+    initialize();
+}
+window.addEventListener('beforeunload', cleanup);
+if (import.meta.hot) import.meta.hot.dispose(cleanup);

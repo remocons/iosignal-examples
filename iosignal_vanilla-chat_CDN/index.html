@@ -11,14 +11,14 @@
         <h1>IOSignal Vanilla JS Chat Example : via CDN</h1>
         <div>URL: <span id="url"></span></div>
         <div>Channel: <span id="channel"></span></div>
-        <div>IO State: <span id="io-state"></span></div>
+        <div>IO State: <span id="io-state" role="status">connecting</span></div>
         <div>Client ID: <span id="cid"></span></div>
         <div>IO Instances: <span id="io-instances"></span></div>
         <div>WebSockets Created: <span id="ws-created"></span></div>
-        <div id="messages" class="messages"></div>
+        <div id="messages" class="messages" role="log" aria-label="Chat messages" tabindex="0"></div>
         <div class="input-area">
-            <input type="text" id="input" />
-            <button id="send-button">Send</button>
+            <input type="text" id="input" aria-label="Message" disabled />
+            <button id="send-button" disabled>Send</button>
         </div>
     </div>
     <script type="module" src="main.js"></script>
