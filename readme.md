@@ -34,7 +34,7 @@ npm run dev
 
 따라서 로컬 개발 시 별도의 IOSignal 서버 실행 명령은 필요하지 않습니다. 브라우저 주소창에는 `http://localhost:517x` 웹 주소를 입력하고, WebSocket 주소는 클라이언트 코드에서 사용합니다.
 
-CDN 예제는 브라우저 클라이언트만 jsDelivr의 IOSignal 5.3.0에서 가져옵니다. 채팅 서버는 다른 예제와 마찬가지로 npm의 IOSignal 패키지를 사용해 Vite가 로컬에서 실행하므로 `npm install`이 필요합니다. CDN을 불러올 인터넷 연결도 필요합니다.
+CDN 예제는 브라우저 클라이언트만 jsDelivr의 IOSignal 7.0.0에서 가져옵니다. 채팅 서버는 다른 예제와 마찬가지로 npm의 IOSignal 패키지를 사용해 Vite가 로컬에서 실행하므로 `npm install`이 필요합니다. CDN을 불러올 인터넷 연결도 필요합니다.
 
 ## 종료·재시작·동시 실행
 
