@@ -1,4 +1,4 @@
-import IO from "https://cdn.jsdelivr.net/npm/iosignal@7.0.0/dist/browser/esm/io.js"
+import IO from "https://cdn.jsdelivr.net/npm/iosignal@7.0.2/dist/browser/esm/io.js"
 
 const url = 'ws://localhost:7780';
 const channel_tag = 'openchat';
