@@ -22,7 +22,7 @@
     "vite": "^8.0.16"
   },
   "dependencies": {
-    "iosignal": "^7.0.2"
+    "iosignal": "^7.1.0"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
