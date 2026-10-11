@@ -2,6 +2,10 @@
 
 IOSignal을 React, Svelte 5, Vanilla JavaScript 환경에서 사용하는 채팅 예제 모음입니다. 각 폴더는 독립적으로 설치하고 실행할 수 있습니다.
 
+<p align="center">
+  <img src="docs/assets/iosignal-ecosystem.png" alt="IOSignal로 연결되는 서버, CLI, Node.js, Arduino와 원격 제어 웹앱" width="720" />
+</p>
+
 ## 예제와 기본 포트
 
 | 예제 | 웹 페이지(Vite) | 채팅 서버(IOSignal) |
