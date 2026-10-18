@@ -1,6 +1,6 @@
 # IOSignal examples
 
-IOSignal을 React, Svelte 5, Vanilla JavaScript 환경에서 사용하는 채팅 예제 모음입니다. 각 폴더는 독립적으로 설치하고 실행할 수 있습니다.
+IOSignal을 React, Svelte 5, Vanilla JavaScript 환경에서 사용하는 채팅 및 WebRTC 화상통화 예제 모음입니다. 각 폴더는 독립적으로 설치하고 실행할 수 있습니다.
 
 <p align="center">
   <img src="docs/assets/iosignal-ecosystem.png" alt="IOSignal로 연결되는 서버, CLI, Node.js, Arduino와 원격 제어 웹앱" width="720" />
@@ -14,6 +14,19 @@ IOSignal을 React, Svelte 5, Vanilla JavaScript 환경에서 사용하는 채팅
 | [Svelte 5](./iosignal_svelte-chat/README.md) | http://localhost:5174 | ws://localhost:7778 |
 | [Vanilla JS](./iosignal_vanilla-chat/README.md) | http://localhost:5175 | ws://localhost:7779 |
 | [Vanilla JS CDN](./iosignal_vanilla-chat_CDN/README.md) | http://localhost:5176 | ws://localhost:7780 |
+| [WebRTC Lab](./iosignal_webrtc/README.md) | http://localhost:5180 | ws://localhost:7781 |
+
+## WebRTC 화상통화 예제
+
+[WebRTC Lab](./iosignal_webrtc/README.md)은 IOSignal 공개 채널로 상대를 발견하고 CID 직접 메시지로 SDP·ICE 후보를 교환하는 1:1 화상통화 앱입니다. 채널명·초대 링크·QR, 내/상대 영상 크기 전환, 마이크·카메라·상대 음량 제어, 실제 시그널링 로그와 ICE/RTT 상태를 제공합니다.
+
+```sh
+cd iosignal_webrtc
+npm install
+npm run dev
+```
+
+`http://localhost:5180`에서 한 탭은 **방 만들기**, 다른 탭은 같은 채널로 **방 참여**를 누르세요. 개발 서버가 IOSignal도 함께 실행합니다. 다른 장치에서 사용하려면 HTTPS 화면과 공개 WSS 서버가 필요하며, NAT/방화벽으로 직접 연결이 불가능할 때는 TURN을 설정해야 합니다. WebRTC 예제의 배포·검증 방법은 [전용 README](./iosignal_webrtc/README.md)를 참고하세요. 아래 채팅 예제 설명과 기본 채널 `openchat`은 기존 네 채팅 예제에 해당합니다.
 
 ## 빠른 시작
 
