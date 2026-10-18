@@ -9,7 +9,7 @@ IOSignal을 WebRTC 시그널링 도구로 사용하는 **실제로 통화 가능
 Node.js 22.12 이상:
 
 ```sh
-npm install
+npm ci
 npm run dev
 ```
 
@@ -90,7 +90,7 @@ VITE_SIGNAL_URL=wss://io.iosignal.net/ws npm run build
 
 | 방식 | 역할과 권장 순서 |
 | --- | --- |
-| `iosignal-examples/iosignal_webrtc` | **소스의 기준 위치**. 다른 예제처럼 npm install / npm run dev로 재현합니다. |
+| `iosignal-examples/iosignal_webrtc` | **소스의 기준 위치**. 다른 예제처럼 npm ci / npm run dev로 재현합니다. |
 | `test.iosignal.net/webrtc/` | **첫 공개 데모로 권장**. 기존 HTTPS 사이트 아래 dist를 배포하고 루트 페이지에 링크를 추가합니다. |
 | `webrtc.iosignal.net` | 고정 홍보 주소가 필요해질 때 같은 dist를 별도 호스트로 배포합니다. DNS·TLS·웹서버 설정이 추가됩니다. |
 

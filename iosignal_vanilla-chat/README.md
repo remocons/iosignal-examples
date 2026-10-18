@@ -9,7 +9,7 @@ Node.js 20.19 이상(20.x) 또는 22.12 이상과 npm이 필요합니다.
 
 ```sh
 cd iosignal_vanilla-chat
-npm install
+npm ci
 npm run dev
 ```
 

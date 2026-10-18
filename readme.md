@@ -22,7 +22,7 @@ IOSignal을 React, Svelte 5, Vanilla JavaScript 환경에서 사용하는 채팅
 
 ```sh
 cd iosignal_webrtc
-npm install
+npm ci
 npm run dev
 ```
 
@@ -30,11 +30,11 @@ npm run dev
 
 ## 빠른 시작
 
-Node.js 20.19 이상(20.x) 또는 22.12 이상과 npm을 준비하세요. 예를 들어 React 예제는 다음과 같이 실행합니다.
+전체 예제를 실행하려면 Node.js 22.16 이상과 npm을 준비하세요. 예를 들어 React 예제는 다음과 같이 실행합니다.
 
 ```sh
 cd iosignal_react-chat
-npm install
+npm ci
 npm run dev
 ```
 
@@ -51,7 +51,7 @@ npm run dev
 
 따라서 로컬 개발 시 별도의 IOSignal 서버 실행 명령은 필요하지 않습니다. 브라우저 주소창에는 `http://localhost:517x` 웹 주소를 입력하고, WebSocket 주소는 클라이언트 코드에서 사용합니다.
 
-CDN 예제는 브라우저 클라이언트만 jsDelivr의 IOSignal 7.1.0에서 가져옵니다. 채팅 서버는 다른 예제와 마찬가지로 npm의 IOSignal 패키지를 사용해 Vite가 로컬에서 실행하므로 `npm install`이 필요합니다. CDN을 불러올 인터넷 연결도 필요합니다.
+CDN 예제는 브라우저 클라이언트만 jsDelivr의 IOSignal 7.2.0에서 가져옵니다. 채팅 서버는 다른 예제와 마찬가지로 npm의 IOSignal 패키지를 사용해 Vite가 로컬에서 실행하므로 `npm ci`이 필요합니다. CDN을 불러올 인터넷 연결도 필요합니다.
 
 ## 종료·재시작·동시 실행
 
@@ -73,7 +73,7 @@ IOSignal 서버 포트와 클라이언트 URL은 반드시 함께 변경하세�
 
 ## 빌드·preview·배포
 
-네 예제 모두 `npm run build`, `npm run preview`, `npm run server`를 제공합니다.
+다섯 예제 모두 `npm run build`, `npm run preview`, `npm run server`를 제공합니다.
 
 개발 중에는 `npm run dev`만 사용합니다. **빌드·preview는 IOSignal 서버를 실행하지 않습니다.** 개발 전용 `configureServer()` 훅에서 서버를 생성하기 때문입니다. 빌드 결과는 클라이언트 파일이며, Svelte도 static adapter로 정적 파일을 생성합니다.
 
@@ -99,3 +99,20 @@ preview가 출력하는 웹 주소를 두 탭에서 열면 됩니다. `server.js
 서비스용 정책보다 연결·구독·송수신 흐름을 쉽게 읽는 데 초점을 둡니다. Enter 전송은 단순하게 유지하며 메시지 크기 제한, 수신 형식 필터, 한글 조합 처리, 기록 개수 제한은 구현하지 않습니다. 문자열 메시지와 `{ text, cid }` 객체를 사용하는 기본 흐름을 보여줍니다.
 
 React의 effect, Svelte의 onMount, Vanilla의 페이지·HMR 정리에서 IO 인스턴스를 종료합니다. Svelte는 메시지가 DOM에 반영된 뒤 스크롤하도록 `tick()`을 사용합니다. CDN 예제는 외부 ESM import 사용을 그대로 보여주며, CDN에 접근할 수 없다면 브라우저 개발자 도구에서 네트워크 오류를 확인하세요.
+
+## 7.2.0 검증 기준
+
+모든 예제의 npm 의존성과 CDN은 IOSignal **7.2.0**으로 고정합니다. `npm ci`로 잠금 파일을 설치하고 `npm ls iosignal`로 확인합니다.
+
+2026-10-18: 5개 예제 빌드, 채팅 4종 양방향 송수신·재접속, WebRTC 통합 테스트 5개가 로컬 Chrome에서 통과했습니다. WebRTC는 가상 캡처 장치를 사용했으며 실제 장치·Safari/iOS·다른 인터넷망·TURN relay는 이 검증에 포함하지 않았습니다.
+
+각 예제에서 `npm ci`를 실행한 뒤 브라우저 테스트를 재현합니다.
+
+```sh
+cd iosignal_webrtc
+npx playwright install chromium
+npm test
+npm run test:chats
+```
+
+설치된 Chrome을 쓰려면 `CHROME_PATH`를 실행 파일 경로로 지정하세요. `test:chats`는 네 채팅 개발 서버를 자동으로 실행하고 종료합니다. CDN 테스트에는 인터넷 연결이 필요합니다.

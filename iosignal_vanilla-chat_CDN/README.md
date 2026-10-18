@@ -9,13 +9,13 @@ Node.js 20.19 이상(20.x) 또는 22.12 이상과 npm이 필요합니다.
 
 ```sh
 cd iosignal_vanilla-chat_CDN
-npm install
+npm ci
 npm run dev
 ```
 
 이미 이 예제 폴더를 VS Code로 열었다면 `cd` 명령은 생략합니다. `npm start`도 같은 개발 서버를 실행합니다.
 
-CDN 예제도 서버 실행을 위해 `npm install`이 필요합니다. 브라우저 클라이언트는 jsDelivr의 IOSignal 7.1.0을 불러오므로 인터넷 연결이 필요합니다.
+CDN 예제도 서버 실행을 위해 `npm ci`이 필요합니다. 브라우저 클라이언트는 jsDelivr의 IOSignal 7.2.0을 불러오므로 인터넷 연결이 필요합니다.
 
 ## Vite가 실행하는 두 서버
 
