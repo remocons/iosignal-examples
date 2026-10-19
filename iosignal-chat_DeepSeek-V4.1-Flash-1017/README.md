@@ -137,8 +137,9 @@ io.subscribe('chat-epl4#chat');
   동적으로 바꾸므로 `ready` 에서 `subscribe()` / `unsubscribe()` 를 직접 호출합니다.
 - 재접속하면 서버 쪽 구독이 사라지므로 `ready` 이벤트마다 로비와 현재 채널을 다시 구독합니다.
 - 태그는 UTF-8 기준 **255 bytes** 제한이 있습니다. 채널 이름은 32자로 잘라 씁니다.
-- 익명 클라이언트의 기본 `signalSize` 는 **1,500 bytes** 입니다. 한글은 글자당 3 bytes라서
-  메시지를 UTF-8 기준 1,100 bytes로 잘라 보냅니다(`clampText`).
+- 메시지 크기 제한(`signalSize`)은 서버 운영자가 설정합니다. 이 앱은 `ready` 이후
+  `io.quota.signalSize`를 읽어 JSON 봉투 크기를 뺀 만큼만 UTF-8 기준으로 잘라 보냅니다(`clampText`).
+  공개 서버의 정책은 바뀔 수 있으므로 고정값을 가정하지 않습니다.
 
 ## 5. 테스트
 

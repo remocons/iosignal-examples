@@ -65,12 +65,16 @@ await step('긴 한글 메시지 quota 안전 처리', async () => {
   await A.fill('#input', '가'.repeat(500));
   await A.press('#input', 'Enter');
   await B.waitForFunction((n) => document.querySelectorAll('.bubble').length > n, before);
-  const bytes = await B.evaluate(() => {
+  const { bytes, signalSize } = await B.evaluate(() => {
     const bubbles = [...document.querySelectorAll('.bubble')];
-    return new TextEncoder().encode(bubbles.at(-1).textContent).length;
+    return {
+      bytes: new TextEncoder().encode(bubbles.at(-1).textContent).length,
+      signalSize: Number(document.documentElement.dataset.iosignalSignalSize) || 0,
+    };
   });
-  console.log(`  clamped bytes: ${bytes}`);
-  if (bytes > 1200) throw new Error(`quota 초과: ${bytes} bytes`);
+  console.log(`  message bytes: ${bytes} / signalSize: ${signalSize}`);
+  if (!signalSize) throw new Error('io.quota.signalSize를 읽지 못했습니다.');
+  if (bytes > signalSize) throw new Error(`quota 초과: ${bytes} > ${signalSize} bytes`);
 });
 
 await step('상대 창 닫기 → 접속자 목록에서 제거', async () => {

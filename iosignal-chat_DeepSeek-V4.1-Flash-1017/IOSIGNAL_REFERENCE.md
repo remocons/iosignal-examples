@@ -17,7 +17,7 @@
 - [ ] 채널은 `room#topic`, 특정 기기 직접 전송은 `상대CID@topic`
 - [ ] 채널 수신은 **구독 필수**, 직접 시그널 수신은 **구독 불필요**
 - [ ] `listen()`은 자동 구독, `subscribe()`는 수동 구독 → 재접속 시 `ready`에서 재구독
-- [ ] 태그는 UTF-8 **255 bytes** 제한, 익명 메시지는 **1,500 bytes** 제한
+- [ ] 태그는 UTF-8 **255 bytes** 제한, quota는 **`ready` 이후 `io.quota.signalSize`** 로 확인
 - [ ] `message` 이벤트로 직접 시그널이 오지 않는다 → `@` / `@topic` 사용
 - [ ] `ready` 전에는 `signal()`/`subscribe()`를 호출하지 않는다
 - [ ] 두 클라이언트로 송수신을 실제 검증한다
@@ -85,13 +85,10 @@ ioServer.on('ready', () => console.log('ws://localhost:5177/ws'));
 
 서버 이벤트: `ready`. 종료는 `ioServer.close(cb)`로 수행합니다.
 
-익명 클라이언트 기본 쿼터(소스 기준 **level 10**):
-
-```text
-signalSize: 1500 bytes, publishCounter: 5, trafficRate: 20 MB/s
-```
-
-쿼터는 서버 설정과 인증 레벨에 따라 달라집니다. 큰 메시지는 `over_size`로 거부됩니다.
+쿼터는 라이브러리 고정값이 아니라 서버 운영자가 `defaultQuotaIndex`·`useQuota`·인증 레벨로
+정하는 정책입니다. 배포 버전의 기본값은 `serverOption`을 참고용으로만 보고, 클라이언트는
+`ready` 이후 `io.level`과 `io.quota.signalSize`를 읽습니다. 큰 메시지는 전송이 생략되고
+`over_size` 이벤트가 발생할 수 있습니다.
 
 ---
 
@@ -208,21 +205,22 @@ io.on('error', (err) => console.error(err));
 | 항목 | 값 / 주의 |
 | --- | --- |
 | 태그 길이 | UTF-8 255 bytes (`listen`/`link`는 빈 태그 불가) |
-| 익명 signalSize | 1,500 bytes (서버/레벨에 따라 다름) |
-| 익명 publishCounter | 5 (대략 초당) |
+| signalSize | `ready` 이후 `io.quota.signalSize` (서버/레벨에 따라 다름) |
+| publishCounter | `ready` 이후 `io.quota.publishCounter` (서버/레벨에 따라 다름) |
 | 토픽 계층 | 미지원 (`a/b`는 문자 그대로) |
 | 리테인 | 서버 설정 의존, `$` 표기 일치 필요 |
-| 한글 메시지 | 글자당 3 bytes → 1,500 bytes 제한에 특히 주의 |
+| 한글 메시지 | 글자당 3 bytes → 현재 `io.quota.signalSize` 기준으로 계산 |
 
 이 예제의 안전장치:
 
 ```js
-// JSON 오버헤드를 고려해 UTF-8 1,100 bytes로 자른다.
-const MAX_TEXT_BYTES = 1100;
+// ready 이후 실제 quota를 읽고, JSON 봉투 크기를 뺀 만큼만 UTF-8로 자른다.
+state.signalSize = state.io.quota.signalSize;
+const messageText = clampText(text, textBudget(base));
 ```
 
 클라이언트 `send()`는 쿼터 초과 시 `over_size`를 emit하고 전송을 건너뜁니다. 예외가 던져지지
-않을 수 있으므로, 긴 메시지는 보내기 전에 바이트 기준으로 잘라야 합니다.
+않을 수 있으므로, 긴 메시지는 보내기 전에 현재 `io.quota.signalSize` 기준으로 잘라야 합니다.
 
 ---
 
@@ -363,7 +361,7 @@ CLI는 인자를 공백으로 나누며 JSON/셸 따옴표를 해석하지 않�
 4. `@`와 `@topic` 양쪽에 같은 핸들러를 등록 → 중복 처리.
 5. `B@topic`을 "B에게서 받는 구독"으로 착각 → 송신은 B에게, 구독은 B의 발행 수신.
 6. `$` 위치를 바꿔 발행/구독 → 다른 태그로 인식.
-7. 한글 1,000자를 1,500 bytes 쿼터에 보냄 → 3,000 bytes로 거부.
+7. 긴 한글 메시지를 현재 quota보다 크게 보냄 → 전송 생략(`over_size`).
 8. `ready` 전에 `signal()` 호출 → 전송되지 않음.
 9. 브라우저에서 ESM 번들을 import map 없이 사용 → bare import 오류.
 10. `destroy()` 후 인스턴스 재사용 → 불가. 새로 생성해야 함.
@@ -417,5 +415,5 @@ npm run test:edge
   - 익명 CID는 `?`로 시작하며 태그에 그대로 사용 가능
   - `io.stateName`은 소문자(`ready`, `closed` 등)
   - 브라우저 ESM 번들은 bare import를 포함 → IIFE 또는 번들러 필요
-  - 익명 쿼터 1,500 bytes, 한글 1,100 bytes 클램프로 안전 전송 확인
+  - `io.quota.signalSize` 기반 클램프로 한글 메시지 안전 전송 확인
 - 테스트 결과: Node 스모크, Chrome 두 창 E2E, 거절·수동 입장·접속자 이탈·모바일 모두 통과

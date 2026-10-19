@@ -18,10 +18,8 @@
   const HEARTBEAT_MS = 20000;
   const PEER_TTL_MS = 70000;
   const PENDING_TTL_MS = 120000;
-  // 익명 클라이언트(quota level 10)의 signalSize 는 1500 bytes 다.
-  // 한글은 글자당 3 bytes 이므로 UTF-8 기준으로도 잘라야 안전하다.
-  const MAX_TEXT = 500;
-  const MAX_TEXT_BYTES = 1100;
+  // signalSize는 배포 공통 고정값이 아니라 서버 운영자가 정하는 값이다.
+  // ready 이후 io.quota.signalSize를 읽어 그 크기에 맞춰 자른다.
   const encoder = new TextEncoder();
 
   const WS_URL = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`;
@@ -69,6 +67,7 @@
     io: null,
     ready: false,
     cid: '',
+    signalSize: 0,
     nick: '',
     nickKey: '',
     peers: new Map(),
@@ -139,18 +138,25 @@
     });
   }
 
-  function clampText(value) {
+  function clampText(value, maxBytes = state.signalSize || Infinity) {
     const s = String(value ?? '');
-    if (encoder.encode(s).length <= MAX_TEXT_BYTES) return s;
+    if (encoder.encode(s).length <= maxBytes) return s;
     const chars = [...s];
     let lo = 0;
     let hi = chars.length;
     while (lo < hi) {
       const mid = (lo + hi + 1) >> 1;
-      if (encoder.encode(chars.slice(0, mid).join('')).length <= MAX_TEXT_BYTES) lo = mid;
+      if (encoder.encode(chars.slice(0, mid).join('')).length <= maxBytes) lo = mid;
       else hi = mid - 1;
     }
     return chars.slice(0, lo).join('');
+  }
+
+  /** JSON envelope bytes count toward the signal quota, so reserve them first. */
+  function textBudget(base) {
+    if (!state.signalSize) return Infinity;
+    const overhead = encoder.encode(JSON.stringify({ ...base, text: '' })).length;
+    return Math.max(0, state.signalSize - overhead - 16);
   }
 
   function hashIndex(str, mod) {
@@ -246,6 +252,8 @@
     const previousCid = state.cid;
     state.ready = true;
     state.cid = state.io.cid || state.cid;
+    state.signalSize = Number(state.io.quota?.signalSize) || 0;
+    document.documentElement.dataset.iosignalSignalSize = String(state.signalSize);
     if (state.room && previousCid && previousCid !== state.cid) {
       state.room.participants.delete(previousCid);
       state.room.participants.set(state.cid, state.nick);
@@ -795,14 +803,19 @@
       toast('연결이 끊겨 메시지를 보내지 못했습니다.', 'err');
       return;
     }
-    const payload = {
+    const base = {
       kind: 'chat',
       msgId: uid(),
       cid: state.cid,
       nick: state.nick,
-      text: clampText(text),
       ts: Date.now(),
     };
+    const messageText = clampText(text, textBudget(base));
+    if (!messageText) {
+      toast('메시지가 서버 quota를 넘습니다.', 'err');
+      return;
+    }
+    const payload = { ...base, text: messageText };
     state.seen.add(payload.msgId);
     signal(state.room.tag, payload);
     renderChatMessage({ ...payload, own: true });
