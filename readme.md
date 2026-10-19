@@ -8,13 +8,16 @@ IOSignal을 React, Svelte 5, Vanilla JavaScript 환경에서 사용하는 채팅
 
 ## 예제와 기본 포트
 
-| 예제 | 웹 페이지(Vite) | 채팅 서버(IOSignal) |
+| 예제 | 웹 페이지 | IOSignal 서버 |
 |---|---|---|
 | [React](./iosignal_react-chat/README.md) | http://localhost:5173 | ws://localhost:7777 |
 | [Svelte 5](./iosignal_svelte-chat/README.md) | http://localhost:5174 | ws://localhost:7778 |
 | [Vanilla JS](./iosignal_vanilla-chat/README.md) | http://localhost:5175 | ws://localhost:7779 |
 | [Vanilla JS CDN](./iosignal_vanilla-chat_CDN/README.md) | http://localhost:5176 | ws://localhost:7780 |
 | [WebRTC Lab](./iosignal_webrtc/README.md) | http://localhost:5180 | ws://localhost:7781 |
+| [IOSignal Chat](./iosignal-chat_DeepSeek-V4.1-Flash-1017/README.md) | http://localhost:5177 | ws://localhost:5177/ws (같은 포트) |
+
+> `IOSignal Chat`은 Vite가 아닌 Node 정적 서버를 사용하며, 웹 페이지와 IOSignal WebSocket을 **한 포트(5177)** 에서 함께 실행합니다.
 
 ## WebRTC 화상통화 예제
 
@@ -28,9 +31,21 @@ npm run dev
 
 `http://localhost:5180`에서 한 탭은 **방 만들기**, 다른 탭은 같은 채널로 **방 참여**를 누르세요. 개발 서버가 IOSignal도 함께 실행합니다. 다른 장치에서 사용하려면 HTTPS 화면과 공개 WSS 서버가 필요하며, NAT/방화벽으로 직접 연결이 불가능할 때는 TURN을 설정해야 합니다. WebRTC 예제의 배포·검증 방법은 [전용 README](./iosignal_webrtc/README.md)를 참고하세요. 아래 채팅 예제 설명과 기본 채널 `openchat`은 기존 네 채팅 예제에 해당합니다.
 
+## 채널 협상 채팅 예제
+
+[IOSignal Chat](./iosignal-chat_DeepSeek-V4.1-Flash-1017/README.md)은 두 창이 **채널을 협상**한 뒤 대화하는 독립 예제입니다. 한쪽이 상대 CID로 제안을 보내면 다른 쪽이 **수락·거절·역제안**으로 응답하고, 합의된 `room#chat` 채널에서 메시지를 주고받습니다. 접속자 발견은 `lobby#presence`, 협상은 `CID@negotiate` 직접 시그널을 사용하며, 모든 과정이 화면의 협상 로그에 남습니다.
+
+```sh
+cd iosignal-chat_DeepSeek-V4.1-Flash-1017
+npm ci
+npm start
+```
+
+`http://localhost:5177`을 두 창에서 열고 한쪽의 **협상** 버튼으로 시작하세요. 웹 페이지와 IOSignal 서버가 같은 포트에서 실행되며, 구조와 협상 프로토콜은 [전용 README](./iosignal-chat_DeepSeek-V4.1-Flash-1017/README.md)에 정리되어 있습니다.
+
 ## 빠른 시작
 
-전체 예제를 실행하려면 Node.js 22.16 이상과 npm을 준비하세요. 예를 들어 React 예제는 다음과 같이 실행합니다.
+Vite 기반 예제를 실행하려면 Node.js 22.16 이상과 npm을 준비하세요. 예를 들어 React 예제는 다음과 같이 실행합니다.
 
 ```sh
 cd iosignal_react-chat
@@ -38,7 +53,7 @@ npm ci
 npm run dev
 ```
 
-다른 예제도 해당 폴더에서 같은 명령으로 실행합니다. 이미 VS Code로 예제 폴더를 열었다면 `cd`는 생략합니다. `npm start`도 개발 서버를 실행합니다.
+다른 Vite 예제도 해당 폴더에서 같은 명령으로 실행합니다. 이미 VS Code로 예제 폴더를 열었다면 `cd`는 생략합니다. `npm start`도 개발 서버를 실행합니다.
 
 브라우저 두 탭에서 **같은 예제의 웹 페이지 주소**를 열고, 양쪽 IO State가 `ready`가 되면 메시지를 보내세요. 공통 채널 이름은 `openchat`입니다.
 
@@ -73,7 +88,7 @@ IOSignal 서버 포트와 클라이언트 URL은 반드시 함께 변경하세�
 
 ## 빌드·preview·배포
 
-다섯 예제 모두 `npm run build`, `npm run preview`, `npm run server`를 제공합니다.
+Vite 기반 다섯 예제 모두 `npm run build`, `npm run preview`, `npm run server`를 제공합니다.
 
 개발 중에는 `npm run dev`만 사용합니다. **빌드·preview는 IOSignal 서버를 실행하지 않습니다.** 개발 전용 `configureServer()` 훅에서 서버를 생성하기 때문입니다. 빌드 결과는 클라이언트 파일이며, Svelte도 static adapter로 정적 파일을 생성합니다.
 
@@ -105,6 +120,8 @@ React의 effect, Svelte의 onMount, Vanilla의 페이지·HMR 정리에서 IO �
 모든 예제의 npm 의존성과 CDN은 IOSignal **7.2.0**으로 고정합니다. `npm ci`로 잠금 파일을 설치하고 `npm ls iosignal`로 확인합니다.
 
 2026-10-18: 5개 예제 빌드, 채팅 4종 양방향 송수신·재접속, WebRTC 통합 테스트 5개가 로컬 Chrome에서 통과했습니다. WebRTC는 가상 캡처 장치를 사용했으며 실제 장치·Safari/iOS·다른 인터넷망·TURN relay는 이 검증에 포함하지 않았습니다.
+
+2026-10-19: 별도 예제 `iosignal-chat_DeepSeek-V4.1-Flash-1017`의 Node 스모크 테스트와 Chrome 두 창 E2E(수락·역제안·거절·수동 입장)를 검증했습니다.
 
 각 예제에서 `npm ci`를 실행한 뒤 브라우저 테스트를 재현합니다.
 

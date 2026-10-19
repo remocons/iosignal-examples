@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>IOSignal Chat</title>
+    <meta
+      name="description"
+      content="IOSignal 채널 협상 데모 - 두 창이 채널을 협상하고 실시간으로 대화하는 웹앱"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%235eead4'/%3E%3Ctext x='32' y='42' font-size='28' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23041019'%3EIO%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">IO</span>
+          <div class="brand-text">
+            <strong>IOSignal Chat</strong>
+            <span>채널 협상 데모</span>
+          </div>
+        </div>
+
+        <div class="conn" id="connBox">
+          <span class="dot" id="connDot" data-state="connecting"></span>
+          <span id="connText">연결 중…</span>
+        </div>
+
+        <div class="cid-box" title="이 창의 고유 CID">
+          <span class="cid-label">내 CID</span>
+          <code id="myCid">—</code>
+          <button type="button" class="icon-btn" id="copyCid" title="CID 복사">복사</button>
+        </div>
+
+        <button type="button" class="ghost" id="newWindow" title="대화 상대가 될 새 창 열기">
+          <span aria-hidden="true">＋</span> 새 창
+        </button>
+      </header>
+
+      <div class="layout">
+        <aside class="sidebar">
+          <section class="panel profile">
+            <label class="panel-title" for="nickInput">내 닉네임</label>
+            <div class="nick-row">
+              <input id="nickInput" maxlength="16" autocomplete="off" spellcheck="false" />
+              <button type="button" class="icon-btn" id="saveNick" title="닉네임 저장">저장</button>
+            </div>
+            <p class="hint">같은 서버에 접속한 창끼리 서로 보입니다.</p>
+          </section>
+
+          <section class="panel peers">
+            <div class="panel-head">
+              <h2 class="panel-title">접속자</h2>
+              <span class="badge" id="peerCount">0</span>
+            </div>
+            <ul id="peerList" class="peer-list" aria-live="polite"></ul>
+            <p class="empty" id="peerEmpty">
+              아직 접속자가 없습니다.<br />
+              오른쪽 위 <strong>＋ 새 창</strong>을 눌러 상대를 만들어 보세요.
+            </p>
+          </section>
+
+          <details class="panel manual">
+            <summary>고급: 채널 태그로 직접 입장</summary>
+            <p class="hint">협상 없이 같은 태그를 아는 사람끼리 입장합니다. 예: <code>team#chat</code></p>
+            <div class="manual-row">
+              <input id="manualChannel" placeholder="team#chat" autocomplete="off" spellcheck="false" />
+              <button type="button" class="primary small" id="manualJoin">입장</button>
+            </div>
+          </details>
+
+          <section class="panel log-panel">
+            <div class="panel-head">
+              <h2 class="panel-title">협상 로그</h2>
+              <button type="button" class="link-btn" id="clearLog">지우기</button>
+            </div>
+            <ol id="logList" class="log-list"></ol>
+            <p class="empty" id="logEmpty">제안·수락·역제안이 이곳에 시간순으로 기록됩니다.</p>
+          </section>
+        </aside>
+
+        <main class="chat">
+          <section id="welcome" class="welcome">
+            <div class="welcome-card">
+              <div class="welcome-icon" aria-hidden="true">⇄</div>
+              <h1>채널을 협상하고 대화를 시작하세요</h1>
+              <p>
+                왼쪽 접속자 목록에서 상대를 고르면 <strong>채널 협상</strong>을 시작할 수 있습니다.
+                상대가 수락하면 두 창이 같은 채널에 입장합니다.
+              </p>
+              <ol class="steps">
+                <li><span>1</span> 새 창을 열어 두 번째 참가자를 만듭니다.</li>
+                <li><span>2</span> 접속자 목록에서 상대의 <strong>협상</strong> 버튼을 누릅니다.</li>
+                <li><span>3</span> 채널 이름을 제안하고, 상대가 수락하면 입장 완료!</li>
+              </ol>
+              <div class="welcome-actions">
+                <button type="button" class="primary" id="welcomeNewWindow">＋ 새 창 열기</button>
+                <button type="button" class="ghost" id="welcomeManual">채널 태그로 입장</button>
+              </div>
+              <p class="protocol-note">
+                협상은 <code>@negotiate</code> 직접 시그널로, 대화는 협상된
+                <code>room#chat</code> 채널로 오갑니다.
+              </p>
+            </div>
+          </section>
+
+          <section id="roomView" class="room" hidden>
+            <div class="room-head">
+              <div class="room-title">
+                <div class="room-badge" id="roomBadge">#</div>
+                <div>
+                  <h2 id="roomName">채널</h2>
+                  <p class="room-meta" id="roomMeta"></p>
+                </div>
+              </div>
+              <div class="room-actions">
+                <button type="button" class="ghost small" id="copyTag">태그 복사</button>
+                <button type="button" class="danger small" id="leaveRoom">나가기</button>
+              </div>
+            </div>
+
+            <div id="messages" class="messages" role="log" aria-live="polite"></div>
+
+            <form id="composer" class="composer" autocomplete="off">
+              <textarea
+                id="input"
+                rows="1"
+                maxlength="500"
+                placeholder="메시지 입력 · Enter 전송, Shift+Enter 줄바꿈"
+              ></textarea>
+              <button type="submit" class="primary send" id="sendBtn" title="전송">
+                전송 <span aria-hidden="true">↵</span>
+              </button>
+            </form>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div id="modalRoot" class="modal-root" hidden></div>
+    <div id="toasts" class="toasts" aria-live="polite"></div>
+
+    <script src="/vendor/io.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>
