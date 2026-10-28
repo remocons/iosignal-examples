@@ -274,5 +274,5 @@ $('clear').onclick = () => { logs.length=0; $('logs').replaceChildren(); };
 $('export').onclick = () => { const url = URL.createObjectURL(new Blob([JSON.stringify(logs,null,2)],{type:'application/json'})); const link=document.createElement('a');link.href=url;link.download='iosignal-webrtc-log.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000); };
 window.addEventListener('pagehide',()=>finish());
 if(import.meta.hot) import.meta.hot.dispose(()=>finish());
-log('lab.ready','IOSignal 7.2.0 · WebRTC · 1:1 audio/video');
+log('lab.ready','IOSignal 8.0.0 · WebRTC · 1:1 audio/video');
 updateInvite().catch(()=>log('qr.error','QR 생성 실패',true));

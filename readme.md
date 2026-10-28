@@ -66,7 +66,7 @@ npm run dev
 
 따라서 로컬 개발 시 별도의 IOSignal 서버 실행 명령은 필요하지 않습니다. 브라우저 주소창에는 `http://localhost:517x` 웹 주소를 입력하고, WebSocket 주소는 클라이언트 코드에서 사용합니다.
 
-CDN 예제는 브라우저 클라이언트만 jsDelivr의 IOSignal 7.2.0에서 가져옵니다. 채팅 서버는 다른 예제와 마찬가지로 npm의 IOSignal 패키지를 사용해 Vite가 로컬에서 실행하므로 `npm ci`이 필요합니다. CDN을 불러올 인터넷 연결도 필요합니다.
+CDN 예제는 브라우저 클라이언트만 jsDelivr의 IOSignal 8.0.0에서 가져옵니다. 채팅 서버는 다른 예제와 마찬가지로 npm의 IOSignal 패키지를 사용해 Vite가 로컬에서 실행하므로 `npm ci`이 필요합니다. CDN을 불러올 인터넷 연결도 필요합니다.
 
 ## 종료·재시작·동시 실행
 
@@ -115,13 +115,13 @@ preview가 출력하는 웹 주소를 두 탭에서 열면 됩니다. `server.js
 
 React의 effect, Svelte의 onMount, Vanilla의 페이지·HMR 정리에서 IO 인스턴스를 종료합니다. Svelte는 메시지가 DOM에 반영된 뒤 스크롤하도록 `tick()`을 사용합니다. CDN 예제는 외부 ESM import 사용을 그대로 보여주며, CDN에 접근할 수 없다면 브라우저 개발자 도구에서 네트워크 오류를 확인하세요.
 
-## 7.2.0 검증 기준
+## 8.0.0 검증 기준
 
-모든 예제의 npm 의존성과 CDN은 IOSignal **7.2.0**으로 고정합니다. `npm ci`로 잠금 파일을 설치하고 `npm ls iosignal`로 확인합니다.
+모든 예제의 npm 의존성과 CDN은 IOSignal **8.0.0**으로 고정합니다. `npm ci`로 잠금 파일을 설치하고 `npm ls iosignal`로 확인합니다.
 
-2026-10-18: 5개 예제 빌드, 채팅 4종 양방향 송수신·재접속, WebRTC 통합 테스트 5개가 로컬 Chrome에서 통과했습니다. WebRTC는 가상 캡처 장치를 사용했으며 실제 장치·Safari/iOS·다른 인터넷망·TURN relay는 이 검증에 포함하지 않았습니다.
+2026-10-28: 5개 예제 빌드, 채팅 4종 양방향 송수신·재접속, WebRTC 통합 테스트 5개가 로컬 Chrome에서 통과했습니다. WebRTC는 가상 캡처 장치를 사용했으며 실제 장치·Safari/iOS·다른 인터넷망·TURN relay는 이 검증에 포함하지 않았습니다.
 
-2026-10-19: 별도 예제 `iosignal-chat_DeepSeek-V4.1-Flash-1017`의 Node 스모크 테스트와 Chrome 두 창 E2E(수락·역제안·거절·수동 입장)를 검증했습니다.
+2026-10-28: 별도 예제 `iosignal-chat_DeepSeek-V4.1-Flash-1017`의 Node 스모크 테스트와 Chrome 두 창 E2E(수락·역제안·거절·수동 입장)를 검증했습니다.
 
 각 예제에서 `npm ci`를 실행한 뒤 브라우저 테스트를 재현합니다.
 

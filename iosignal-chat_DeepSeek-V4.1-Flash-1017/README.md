@@ -1,6 +1,6 @@
 # IOSignal Chat — 채널 협상 채팅 데모
 
-[IOSignal](https://iosignal.net) 7.2.0으로 만든 실시간 채팅 웹앱입니다.
+[IOSignal](https://iosignal.net) 8.0.0으로 만든 실시간 채팅 웹앱입니다.
 두 개의 브라우저 창이 **채널을 서로 협상(제안 → 수락/거절/역제안)**한 뒤, 합의된
 채널에서 메시지를 주고받습니다. 협상 과정은 화면의 **협상 로그**에 그대로 남습니다.
 
@@ -98,7 +98,7 @@ npm start
 | `public/index.html` | 화면 구조 |
 | `public/styles.css` | 다크 테마 UI, 반응형 레이아웃 |
 | `public/app.js` | 접속/협상/채팅 로직 (약 1,000줄) |
-| `IOSIGNAL_REFERENCE.md` | IOSignal 7.2.0 핵심 요약 — API·태그·제한·검증된 패턴 |
+| `IOSIGNAL_REFERENCE.md` | IOSignal 8.0.0 핵심 요약 — API·태그·제한·검증된 패턴 |
 | `public/vendor/io.js` | `node_modules/iosignal` 의 브라우저 IIFE 번들을 서버가 제공 |
 | `scripts/smoke.mjs` | Node 클라이언트 2개로 협상·채팅·직접 시그널 검증 |
 | `scripts/browser-test.mjs` | 실제 Chrome 두 창으로 수락·대화·역제안 검증 |
