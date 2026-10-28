@@ -50,7 +50,7 @@ subscribe(webrtc-lab-방)        채널 구독          subscribe(webrtc-lab-방
                    직접 연결 또는 TURN relay
 ```
 
-핵심 API는 `io.subscribe(channel)`, `io.signal(channel, message)`, `io.signal(peerCid + '@rtc', message)`, 채널용 `io.on('message', handler)`와 직접 메시지용 `io.on('@rtc', handler)`입니다. 실제 IOSignal 7.2.0 라이브러리를 사용합니다. 별도의 Socket.IO나 커스텀 WebSocket 시그널 프로토콜로 대체하지 않습니다.
+핵심 API는 `io.subscribe(channel)`, `io.signal(channel, message)`, `io.signal(peerCid + '@rtc', message)`, 채널용 `io.on('message', handler)`와 직접 메시지용 `io.on('@rtc', handler)`입니다. 실제 IOSignal 8.0.0 라이브러리를 사용합니다. 별도의 Socket.IO나 커스텀 WebSocket 시그널 프로토콜로 대체하지 않습니다.
 
 `#`로 시작하는 HOME CHANNEL 대신 일반 공개 채널(`webrtc-lab-...`)을 사용하므로 같은 네트워크에 묶이지 않습니다. CID 직접 메시지는 `message` 이벤트가 아닌 `@rtc` 이벤트로 수신합니다.
 

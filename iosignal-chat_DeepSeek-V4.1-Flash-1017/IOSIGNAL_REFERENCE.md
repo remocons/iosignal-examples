@@ -316,7 +316,7 @@ window.addEventListener('pagehide', () => {
 ### CLI (빠른 프로토콜 확인)
 
 ```bash
-npm install -g iosignal-cli@7.2.0
+npm install -g iosignal-cli@8.0.0
 io-server -l 7777
 io-client -c ws://localhost:7777
 ```
