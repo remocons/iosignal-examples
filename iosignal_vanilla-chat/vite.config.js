@@ -12,7 +12,7 @@ function iosignalServer() {
       closing = undefined;
       server = new Server({
         port: 7779,
-        showMessage: 'message',
+        logMessages: true,
       });
       server.on('ready', () => {
         console.log(`iosignal server ${version} listening port : ${server.port}`);

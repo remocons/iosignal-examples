@@ -18,8 +18,8 @@
   const HEARTBEAT_MS = 20000;
   const PEER_TTL_MS = 70000;
   const PENDING_TTL_MS = 120000;
-  // signalSize는 배포 공통 고정값이 아니라 서버 운영자가 정하는 값이다.
-  // ready 이후 io.quota.signalSize를 읽어 그 크기에 맞춰 자른다.
+  // 메시지 크기 한도(maxMessageBytes)는 배포 공통 고정값이 아니라 서버 운영자가 정하는 값이다.
+  // ready 이후 io.quota.maxMessageBytes를 읽어 그 크기에 맞춰 자른다(null: 제한 없음).
   const encoder = new TextEncoder();
 
   const WS_URL = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`;
@@ -252,7 +252,7 @@
     const previousCid = state.cid;
     state.ready = true;
     state.cid = state.io.cid || state.cid;
-    state.signalSize = Number(state.io.quota?.signalSize) || 0;
+    state.signalSize = Number(state.io.quota?.maxMessageBytes) || 0;
     document.documentElement.dataset.iosignalSignalSize = String(state.signalSize);
     if (state.room && previousCid && previousCid !== state.cid) {
       state.room.participants.delete(previousCid);

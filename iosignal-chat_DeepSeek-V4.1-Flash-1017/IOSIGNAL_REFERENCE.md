@@ -1,9 +1,9 @@
-# IOSignal 8.0.0 핵심 레퍼런스
+# IOSignal 9.0.0 핵심 레퍼런스
 
 > **이 문서의 목적:** IOSignal 코드를 새로 만들 때 iosignal.net 문서 전체를 다시 읽지 않고
 > 바로 시작할 수 있도록, 실제로 검증한 API·태그 규칙·제한·패턴만 압축한 요약입니다.
 >
-> **기준:** `iosignal@8.0.0`, Node.js 22.16.0, 2026-10-28 실행 검증.
+> **기준:** `iosignal@9.0.0`, 2026-11-03 실행 재검증 (최초 검증: `iosignal@8.0.0`, Node.js 22.16.0, 2026-10-28).
 > 버전을 올리면 동작과 제한이 바뀔 수 있으므로 먼저 `package.json`의 버전을 확인하세요.
 > 이 문서에 없는 인증 세부 설정·쿼터 커스터마이즈·Arduino 핀 설정은 공식 문서를 참고해야 합니다.
 
@@ -17,7 +17,7 @@
 - [ ] 채널은 `room#topic`, 특정 기기 직접 전송은 `상대CID@topic`
 - [ ] 채널 수신은 **구독 필수**, 직접 시그널 수신은 **구독 불필요**
 - [ ] `listen()`은 자동 구독, `subscribe()`는 수동 구독 → 재접속 시 `ready`에서 재구독
-- [ ] 태그는 UTF-8 **255 bytes** 제한, quota는 **`ready` 이후 `io.quota.signalSize`** 로 확인
+- [ ] 태그는 UTF-8 **255 bytes** 제한, quota는 **`ready` 이후 `io.quota.maxMessageBytes`** 로 확인
 - [ ] `message` 이벤트로 직접 시그널이 오지 않는다 → `@` / `@topic` 사용
 - [ ] `ready` 전에는 `signal()`/`subscribe()`를 호출하지 않는다
 - [ ] 두 클라이언트로 송수신을 실제 검증한다
@@ -29,14 +29,14 @@
 ```bash
 mkdir my-app && cd my-app
 npm init -y
-npm install --save-exact iosignal@8.0.0
+npm install --save-exact iosignal@9.0.0
 ```
 
 | 환경 | import |
 | --- | --- |
 | Node.js | `import { IO, Server } from 'iosignal'` |
 | 번들러(Vite/React/Svelte) | `import IO from 'iosignal/browser/esm/io.js'` |
-| 브라우저 CDN/IIFE | `<script src="https://cdn.jsdelivr.net/npm/iosignal@8.0.0/dist/browser/iife/io.js"></script>` → 전역 `IO` |
+| 브라우저 CDN/IIFE | `<script src="https://cdn.jsdelivr.net/npm/iosignal@9.0.0/dist/browser/iife/io.js"></script>` → 전역 `IO` |
 
 **주의(검증됨):** `dist/browser/esm/io.js`는 `boho`, `buffer`, `eventemitter3` 등을 bare import로
 포함합니다. import map 없이 브라우저에서 그대로 로드하면 해석에 실패합니다. 이 예제는
@@ -79,15 +79,16 @@ ioServer.on('ready', () => console.log('ws://localhost:5177/ws'));
 | `httpServer` | 기존 HTTP 서버 공유 (`port`와 동시 사용 불가) |
 | `wsPath` | WebSocket 경로 (예: `/ws`) |
 | `congPort` | Arduino/CongSocket용 TCP 포트 |
-| `showMessage`, `showMetric` | 서버 로그 수준 |
+| `logMessages`, `logStats` | 서버 로그 (`server.stats()`로 현재 상태 조회) |
 | `retain` | `$` 리테인 사용 여부·크기·개수 (서버 설정 의존) |
-| `useQuota` | 신호 크기·발행 수·트래픽 제한 |
+| `quotas`, `anonymousQuota` | 쿼터 프로필(메시지 크기·팬아웃·초당 메시지/바이트·계정당 연결 수)과 익명 연결이 쓸 프로필 |
 
 서버 이벤트: `ready`. 종료는 `ioServer.close(cb)`로 수행합니다.
 
-쿼터는 라이브러리 고정값이 아니라 서버 운영자가 `defaultQuotaIndex`·`useQuota`·인증 레벨로
-정하는 정책입니다. 배포 버전의 기본값은 `serverOption`을 참고용으로만 보고, 클라이언트는
-`ready` 이후 `io.level`과 `io.quota.signalSize`를 읽습니다. 큰 메시지는 전송이 생략되고
+쿼터는 라이브러리 고정값이 아니라 서버 운영자가 쿼터 프로필(`quotas`)과 계정별 프로필로
+정하는 정책입니다. 익명 연결은 `anonymousQuota`, 로그인한 연결은 키 항목이나 `resolveQuota`가 정한
+프로필을 씁니다. 9.0부터 레벨(`io.level`)은 없습니다. 클라이언트는 서버가 보내는 `QUOTA` 메시지로
+`io.quota.maxMessageBytes`를 받으며(`ready` 전에 도착, `null`은 제한 없음) 이 값을 읽습니다. 큰 메시지는 전송이 생략되고
 `over_size` 이벤트가 발생할 수 있습니다.
 
 ---
@@ -205,22 +206,22 @@ io.on('error', (err) => console.error(err));
 | 항목 | 값 / 주의 |
 | --- | --- |
 | 태그 길이 | UTF-8 255 bytes (`listen`/`link`는 빈 태그 불가) |
-| signalSize | `ready` 이후 `io.quota.signalSize` (서버/레벨에 따라 다름) |
-| publishCounter | `ready` 이후 `io.quota.publishCounter` (서버/레벨에 따라 다름) |
+| maxMessageBytes | `ready` 이후 `io.quota.maxMessageBytes` (서버의 쿼터 프로필에 따라 다름, `null`은 제한 없음) |
+| 발행 수·트래픽 | 서버가 쿼터 프로필(`fanout`, `msgPerSec`, `bytesPerSec`)로 강제, 클라이언트에는 알리지 않음 |
 | 토픽 계층 | 미지원 (`a/b`는 문자 그대로) |
 | 리테인 | 서버 설정 의존, `$` 표기 일치 필요 |
-| 한글 메시지 | 글자당 3 bytes → 현재 `io.quota.signalSize` 기준으로 계산 |
+| 한글 메시지 | 글자당 3 bytes → 현재 `io.quota.maxMessageBytes` 기준으로 계산 |
 
 이 예제의 안전장치:
 
 ```js
 // ready 이후 실제 quota를 읽고, JSON 봉투 크기를 뺀 만큼만 UTF-8로 자른다.
-state.signalSize = state.io.quota.signalSize;
+state.signalSize = Number(state.io.quota?.maxMessageBytes) || 0; // 0: 제한 없음
 const messageText = clampText(text, textBudget(base));
 ```
 
 클라이언트 `send()`는 쿼터 초과 시 `over_size`를 emit하고 전송을 건너뜁니다. 예외가 던져지지
-않을 수 있으므로, 긴 메시지는 보내기 전에 현재 `io.quota.signalSize` 기준으로 잘라야 합니다.
+않을 수 있으므로, 긴 메시지는 보내기 전에 현재 `io.quota.maxMessageBytes` 기준으로 잘라야 합니다.
 
 ---
 
@@ -415,5 +416,5 @@ npm run test:edge
   - 익명 CID는 `?`로 시작하며 태그에 그대로 사용 가능
   - `io.stateName`은 소문자(`ready`, `closed` 등)
   - 브라우저 ESM 번들은 bare import를 포함 → IIFE 또는 번들러 필요
-  - `io.quota.signalSize` 기반 클램프로 한글 메시지 안전 전송 확인
+  - `io.quota.signalSize` 기반 클램프로 한글 메시지 안전 전송 확인 (9.0에서는 `io.quota.maxMessageBytes`)
 - 테스트 결과: Node 스모크, Chrome 두 창 E2E, 거절·수동 입장·접속자 이탈·모바일 모두 통과

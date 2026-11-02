@@ -72,8 +72,8 @@ await step('긴 한글 메시지 quota 안전 처리', async () => {
       signalSize: Number(document.documentElement.dataset.iosignalSignalSize) || 0,
     };
   });
-  console.log(`  message bytes: ${bytes} / signalSize: ${signalSize}`);
-  if (!signalSize) throw new Error('io.quota.signalSize를 읽지 못했습니다.');
+  console.log(`  message bytes: ${bytes} / maxMessageBytes: ${signalSize}`);
+  if (!signalSize) throw new Error('io.quota.maxMessageBytes를 읽지 못했습니다.');
   if (bytes > signalSize) throw new Error(`quota 초과: ${bytes} > ${signalSize} bytes`);
 });
 

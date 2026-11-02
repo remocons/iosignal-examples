@@ -1,6 +1,6 @@
 # IOSignal Chat — 채널 협상 채팅 데모
 
-[IOSignal](https://iosignal.net) 8.0.0으로 만든 실시간 채팅 웹앱입니다.
+[IOSignal](https://iosignal.net) 9.0.0으로 만든 실시간 채팅 웹앱입니다.
 두 개의 브라우저 창이 **채널을 서로 협상(제안 → 수락/거절/역제안)**한 뒤, 합의된
 채널에서 메시지를 주고받습니다. 협상 과정은 화면의 **협상 로그**에 그대로 남습니다.
 
@@ -98,7 +98,7 @@ npm start
 | `public/index.html` | 화면 구조 |
 | `public/styles.css` | 다크 테마 UI, 반응형 레이아웃 |
 | `public/app.js` | 접속/협상/채팅 로직 (약 1,000줄) |
-| `IOSIGNAL_REFERENCE.md` | IOSignal 8.0.0 핵심 요약 — API·태그·제한·검증된 패턴 |
+| `IOSIGNAL_REFERENCE.md` | IOSignal 9.0.0 핵심 요약 — API·태그·제한·검증된 패턴 |
 | `public/vendor/io.js` | `node_modules/iosignal` 의 브라우저 IIFE 번들을 서버가 제공 |
 | `scripts/smoke.mjs` | Node 클라이언트 2개로 협상·채팅·직접 시그널 검증 |
 | `scripts/browser-test.mjs` | 실제 Chrome 두 창으로 수락·대화·역제안 검증 |
@@ -137,8 +137,8 @@ io.subscribe('chat-epl4#chat');
   동적으로 바꾸므로 `ready` 에서 `subscribe()` / `unsubscribe()` 를 직접 호출합니다.
 - 재접속하면 서버 쪽 구독이 사라지므로 `ready` 이벤트마다 로비와 현재 채널을 다시 구독합니다.
 - 태그는 UTF-8 기준 **255 bytes** 제한이 있습니다. 채널 이름은 32자로 잘라 씁니다.
-- 메시지 크기 제한(`signalSize`)은 서버 운영자가 설정합니다. 이 앱은 `ready` 이후
-  `io.quota.signalSize`를 읽어 JSON 봉투 크기를 뺀 만큼만 UTF-8 기준으로 잘라 보냅니다(`clampText`).
+- 메시지 크기 제한(`maxMessageBytes`)은 서버 운영자가 설정합니다. 이 앱은 `ready` 이후
+  `io.quota.maxMessageBytes`를 읽어 JSON 봉투 크기를 뺀 만큼만 UTF-8 기준으로 잘라 보냅니다(`clampText`).
   공개 서버의 정책은 바뀔 수 있으므로 고정값을 가정하지 않습니다.
 
 ## 5. 테스트
