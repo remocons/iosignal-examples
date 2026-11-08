@@ -1,9 +1,9 @@
-# IOSignal 9.0.0 핵심 레퍼런스
+# IOSignal 9.6.0 핵심 레퍼런스
 
 > **이 문서의 목적:** IOSignal 코드를 새로 만들 때 iosignal.net 문서 전체를 다시 읽지 않고
 > 바로 시작할 수 있도록, 실제로 검증한 API·태그 규칙·제한·패턴만 압축한 요약입니다.
 >
-> **기준:** `iosignal@9.0.0`, 2026-11-03 실행 재검증 (최초 검증: `iosignal@8.0.0`, Node.js 22.16.0, 2026-10-28).
+> **기준:** `iosignal@9.6.0`, 2026-11-09 실행 재검증 (9.0.0: 2026-11-03) (최초 검증: `iosignal@8.0.0`, Node.js 22.16.0, 2026-10-28).
 > 버전을 올리면 동작과 제한이 바뀔 수 있으므로 먼저 `package.json`의 버전을 확인하세요.
 > 이 문서에 없는 인증 세부 설정·쿼터 커스터마이즈·Arduino 핀 설정은 공식 문서를 참고해야 합니다.
 
@@ -19,7 +19,8 @@
 - [ ] `listen()`은 자동 구독, `subscribe()`는 수동 구독 → 재접속 시 `ready`에서 재구독
 - [ ] 태그는 UTF-8 **255 bytes** 제한, quota는 **`ready` 이후 `io.quota.maxMessageBytes`** 로 확인
 - [ ] `message` 이벤트로 직접 시그널이 오지 않는다 → `@` / `@topic` 사용
-- [ ] `ready` 전에는 `signal()`/`subscribe()`를 호출하지 않는다
+- [ ] `ready` 전에는 `signal()`/`subscribe()`를 호출하지 않는다 (`subscribe()`는 ready가 아니면 예외)
+- [ ] `listen()`은 초기화 코드에서만 호출한다 (`ready` 핸들러 안에서는 예외)
 - [ ] 두 클라이언트로 송수신을 실제 검증한다
 
 ---
@@ -29,14 +30,14 @@
 ```bash
 mkdir my-app && cd my-app
 npm init -y
-npm install --save-exact iosignal@9.0.0
+npm install --save-exact iosignal@9.6.0
 ```
 
 | 환경 | import |
 | --- | --- |
 | Node.js | `import { IO, Server } from 'iosignal'` |
 | 번들러(Vite/React/Svelte) | `import IO from 'iosignal/browser/esm/io.js'` |
-| 브라우저 CDN/IIFE | `<script src="https://cdn.jsdelivr.net/npm/iosignal@9.0.0/dist/browser/iife/io.js"></script>` → 전역 `IO` |
+| 브라우저 CDN/IIFE | `<script src="https://cdn.jsdelivr.net/npm/iosignal@9.6.0/dist/browser/iife/io.js"></script>` → 전역 `IO` |
 
 **주의(검증됨):** `dist/browser/esm/io.js`는 `boho`, `buffer`, `eventemitter3` 등을 bare import로
 포함합니다. import map 없이 브라우저에서 그대로 로드하면 해석에 실패합니다. 이 예제는
@@ -158,9 +159,9 @@ io.on('error', (err) => console.error(err));
 | API | 용도 |
 | --- | --- |
 | `signal(tag, ...args)` | 태그로 전송 (별칭 `publish`) |
-| `subscribe(tag)` | 즉시 구독. 쉼표로 여러 태그 가능 |
+| `subscribe(tag)` | 즉시 구독. 쉼표로 여러 태그 가능. ready가 아니면 예외 |
 | `unsubscribe(tag?)` | 구독 해제. 인자 없으면 전체 해제 |
-| `listen(tag, handler)` | 핸들러 등록 + 자동 구독 예약 |
+| `listen(tag, handler)` | 핸들러 등록 + 자동 구독 예약. ready 핸들러 안에서는 예외 |
 | `on(tag, handler)` | 핸들러만 등록 (서버 구독 없음) |
 | `link(to, tag, handler)` | 컴포넌트 단위 핸들러 연결 |
 | `unlink(to, tag)`, `unlinkAll(to)` | 컴포넌트 단위 해제 |
@@ -174,11 +175,12 @@ io.on('error', (err) => console.error(err));
 | | `listen()` | `subscribe()` |
 | --- | --- | --- |
 | 핸들러 등록 | 함 | 안 함 (`on` 별도) |
-| 전송 시점 | **ready 시점** (이미 ready여도 즉시 보내지 않음) | 호출 즉시 |
+| 전송 시점 | **CID 수신 후 `ready` 이벤트 전** (이미 ready여도 즉시 보내지 않음) | 호출 즉시 (ready가 아니면 예외) |
 | 재접속 자동 재구독 | 함 | **안 함** → `ready`마다 직접 호출 |
 | 직접 태그(`@topic`) | 로컬 핸들러만 등록 | 사용 불가 (구독 대상 아님) |
 
-- 연결 준비 전에는 `signal()`/`subscribe()`를 호출하지 마세요. `ready` 이후에 호출합니다.
+- 연결 준비 전에는 `signal()`/`subscribe()`를 호출하지 마세요. `ready` 이후에 호출합니다. 9.6.0부터 `subscribe()`는 ready가 아니면 예외를 던집니다.
+- 9.6.0부터 `listen()`·`link()`로 저장한 구독은 `ready` 이벤트 전에 전송되므로 `ready` 핸들러에서 바로 송신해도 자신의 구독보다 앞서지 않습니다. `ready` 핸들러 안에서 `listen()`을 호출하면 예외입니다.
 - 구독 직후 같은 소켓으로 송신하는 경우, 구독 패킷이 먼저 처리되도록 약간의 지연(예: 100~150ms)을 두면 안전합니다.
 - `subscribe('a,b')`는 전체 문자열이 255 bytes 이하여야 합니다. 긴 목록은 여러 번 호출합니다.
 
@@ -356,7 +358,7 @@ CLI는 인자를 공백으로 나누며 JSON/셸 따옴표를 해석하지 않�
 
 ## 11. 자주 하는 실수
 
-1. `listen()`이 즉시 구독 패킷을 보낸다고 가정 → 실제로는 ready 시점에 전송.
+1. `listen()`이 즉시 구독 패킷을 보낸다고 가정 → 실제로는 CID 수신 후 `ready` 이벤트 전에 전송.
 2. 재접속 후 수동 `subscribe()`를 다시 하지 않음 → 채널 수신 끊김.
 3. 직접 시그널을 `message`로 받으려 함 → `@`/`@topic` 사용.
 4. `@`와 `@topic` 양쪽에 같은 핸들러를 등록 → 중복 처리.
