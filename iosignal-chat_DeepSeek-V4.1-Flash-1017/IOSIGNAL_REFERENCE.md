@@ -1,9 +1,9 @@
-# IOSignal 9.6.0 핵심 레퍼런스
+# IOSignal 9.12.0 핵심 레퍼런스
 
 > **이 문서의 목적:** IOSignal 코드를 새로 만들 때 iosignal.net 문서 전체를 다시 읽지 않고
 > 바로 시작할 수 있도록, 실제로 검증한 API·태그 규칙·제한·패턴만 압축한 요약입니다.
 >
-> **기준:** `iosignal@9.6.0`, 2026-11-09 실행 재검증 (9.0.0: 2026-11-03) (최초 검증: `iosignal@8.0.0`, Node.js 22.16.0, 2026-10-28).
+> **기준:** `iosignal@9.12.0`, 2026-11-12 실행 재검증 (9.6.0: 2026-11-09, 9.0.0: 2026-11-03) (최초 검증: `iosignal@8.0.0`, Node.js 22.16.0, 2026-10-28).
 > 버전을 올리면 동작과 제한이 바뀔 수 있으므로 먼저 `package.json`의 버전을 확인하세요.
 > 이 문서에 없는 인증 세부 설정·쿼터 커스터마이즈·Arduino 핀 설정은 공식 문서를 참고해야 합니다.
 
@@ -30,14 +30,14 @@
 ```bash
 mkdir my-app && cd my-app
 npm init -y
-npm install --save-exact iosignal@9.6.0
+npm install --save-exact iosignal@9.12.0
 ```
 
 | 환경 | import |
 | --- | --- |
 | Node.js | `import { IO, Server } from 'iosignal'` |
 | 번들러(Vite/React/Svelte) | `import IO from 'iosignal/browser/esm/io.js'` |
-| 브라우저 CDN/IIFE | `<script src="https://cdn.jsdelivr.net/npm/iosignal@9.6.0/dist/browser/iife/io.js"></script>` → 전역 `IO` |
+| 브라우저 CDN/IIFE | `<script src="https://cdn.jsdelivr.net/npm/iosignal@9.12.0/dist/browser/iife/io.js"></script>` → 전역 `IO` |
 
 **주의(검증됨):** `dist/browser/esm/io.js`는 `boho`, `buffer`, `eventemitter3` 등을 bare import로
 포함합니다. import map 없이 브라우저에서 그대로 로드하면 해석에 실패합니다. 이 예제는
