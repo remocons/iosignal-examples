@@ -1,0 +1,26 @@
+{
+  "name": "iosignal-host-quiz",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "IOSignal server.host() example: a live quiz judged inside the server, with the sender of every answer known to the server",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "keywords": [
+    "iosignal",
+    "websocket",
+    "quiz",
+    "game",
+    "server.host"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "iosignal": "9.21.0"
+  },
+  "engines": {
+    "node": ">=22.16.0"
+  }
+}

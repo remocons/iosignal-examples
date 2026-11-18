@@ -1,6 +1,6 @@
 # IOSignal examples
 
-IOSignal을 React, Svelte 5, Vanilla JavaScript 환경에서 사용하는 채팅 및 WebRTC 화상통화 예제 모음입니다. 각 폴더는 독립적으로 설치하고 실행할 수 있습니다.
+IOSignal을 React, Svelte 5, Vanilla JavaScript 환경에서 사용하는 채팅·WebRTC 화상통화 예제와, 서버가 판정하는 게임 예제(`server.host`) 모음입니다. 각 폴더는 독립적으로 설치하고 실행할 수 있습니다.
 
 <p align="center">
   <img src="docs/assets/iosignal-ecosystem.png" alt="IOSignal로 연결되는 서버, CLI, Node.js, Arduino와 원격 제어 웹앱" width="720" />
@@ -16,6 +16,7 @@ IOSignal을 React, Svelte 5, Vanilla JavaScript 환경에서 사용하는 채팅
 | [Vanilla JS CDN](./iosignal_vanilla-chat_CDN/README.md) | http://localhost:5176 | ws://localhost:7780 |
 | [WebRTC Lab](./iosignal_webrtc/README.md) | http://localhost:5180 | ws://localhost:7781 |
 | [IOSignal Chat](./iosignal-chat_DeepSeek-V4.1-Flash-1017/README.md) | http://localhost:5177 | ws://localhost:5177/ws (같은 포트) |
+| [Host Quiz](./iosignal_host-quiz/README.md) | http://localhost:5181 | ws://localhost:5181/ws (같은 포트) |
 
 > `IOSignal Chat`은 Vite가 아닌 Node 정적 서버를 사용하며, 웹 페이지와 IOSignal WebSocket을 **한 포트(5177)** 에서 함께 실행합니다.
 
@@ -30,6 +31,18 @@ npm run dev
 ```
 
 `http://localhost:5180`에서 한 탭은 **방 만들기**, 다른 탭은 같은 채널로 **방 참여**를 누르세요. 개발 서버가 IOSignal도 함께 실행합니다. 다른 장치에서 사용하려면 HTTPS 화면과 공개 WSS 서버가 필요하며, NAT/방화벽으로 직접 연결이 불가능할 때는 TURN을 설정해야 합니다. WebRTC 예제의 배포·검증 방법은 [전용 README](./iosignal_webrtc/README.md)를 참고하세요. 아래 채팅 예제 설명과 기본 채널 `openchat`은 기존 네 채팅 예제에 해당합니다.
+
+## 서버가 채점하는 퀴즈 예제
+
+[Host Quiz](./iosignal_host-quiz/README.md)는 `server.host()`로 문제 진행과 채점을 **IOSignal 서버 안**에서 하는 실시간 퀴즈입니다. 호스트는 답마다 서버가 확인한 보낸 사람(`from.cid`)을 받고, 점수판(`quiz#$state`)과 개인 결과(`@quiz.you`)는 호스트만 보낼 수 있습니다. 화면의 **위조해 보기**로 부정행위가 막히는 것을 직접 확인할 수 있습니다. 게임·퀴즈·투표처럼 서버가 판정해야 하는 응용의 출발점입니다.
+
+```sh
+cd iosignal_host-quiz
+npm ci
+npm start
+```
+
+`http://localhost:5181`을 두 창 이상에서 열고 닉네임으로 입장하세요. `/dashboard`에서 서버 상태와 퀴즈 호스트를 볼 수 있습니다. 호스트는 서버 프로세스 안에서 동작하므로 공개 서버가 아닌 자기 서버로 실행합니다.
 
 ## 채널 협상 채팅 예제
 
@@ -128,6 +141,8 @@ React의 effect, Svelte의 onMount, Vanilla의 페이지·HMR 정리에서 IO �
 2026-11-12 (9.12.0): 5개 예제 빌드, WebRTC 통합 테스트 5개, DeepSeek 예제의 스모크·Chrome E2E·엣지 테스트가 통과했습니다. 채팅 4종 브라우저 테스트(`npm run test:chats`)는 로컬 7777 포트를 다른 서버가 쓰고 있어 이번에는 실행하지 못했습니다. 9.12.0은 클라이언트 API 변경이 없습니다.
 
 2026-11-09 (9.6.0): 같은 범위(5개 예제 빌드, 채팅 4종 양방향 송수신·재접속(CDN 포함), WebRTC 통합 테스트 5개, DeepSeek 예제의 스모크·Chrome E2E·엣지 테스트)가 로컬 Chrome에서 통과했습니다. 예제 코드는 수동 `subscribe()`를 `ready` 상태에서만 호출하므로 9.6.0의 새 호출 시점 검사로 바뀐 코드는 없습니다.
+
+2026-11-18: `iosignal_host-quiz`를 추가했습니다(iosignal 9.21.0). `npm test` 5개(규칙 시험, 실제 소켓으로 두 명이 푸는 시험과 위조 태그 차단)가 통과했습니다.
 
 각 예제에서 `npm ci`를 실행한 뒤 브라우저 테스트를 재현합니다.
 
