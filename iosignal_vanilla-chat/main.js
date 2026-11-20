@@ -3,6 +3,8 @@ import IO from 'iosignal/browser/esm/io.js';
 // A build can choose another server: VITE_SIGNAL_URL=wss://io.iosignal.net/ws npm run build
 const url = import.meta.env.VITE_SIGNAL_URL || 'ws://localhost:7779';
 const channel_tag = 'openchat';
+// A site build can link back to its example list: VITE_HOME_URL=https://lab.iosignal.net/ npm run build
+const homeUrl = import.meta.env?.VITE_HOME_URL;
 
 const urlDisplay = document.getElementById('url');
 const channelDisplay = document.getElementById('channel');
@@ -61,6 +63,11 @@ const handleKeyUp = (event) => {
 };
 
 function initialize() {
+    if (homeUrl) {
+        const homeLink = document.getElementById('home-link');
+        homeLink.href = homeUrl;
+        homeLink.hidden = false;
+    }
     urlDisplay.textContent = url;
     channelDisplay.textContent = channel_tag;
     io = new IO();

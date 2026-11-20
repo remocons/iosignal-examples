@@ -62,3 +62,9 @@ h1 {
 .messages { overflow-wrap: anywhere; }
 .input-area input { min-width: 0; }
 .input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.home-link {
+  align-self: flex-start;
+  margin-bottom: 8px;
+  font-size: 14px;
+}

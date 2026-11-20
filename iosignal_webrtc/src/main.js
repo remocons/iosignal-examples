@@ -6,6 +6,8 @@ const $ = id => document.getElementById(id);
 const uuid = () => crypto.randomUUID();
 const params = new URLSearchParams(location.hash.slice(1));
 const invited = params.has('room');
+// A site build can point the brand at its home: VITE_HOME_URL=https://lab.iosignal.net/ npm run build
+if (import.meta.env.VITE_HOME_URL) $('home-link').href = import.meta.env.VITE_HOME_URL;
 const isLoopback = host => ['localhost', '127.0.0.1', '[::1]'].includes(host);
 $('room').value = params.get('room') || `lab-${uuid().slice(0, 8)}`;
 const defaultSignalUrl = import.meta.env.VITE_SIGNAL_URL || (import.meta.env.DEV ? `ws://${location.hostname}:7781` : 'wss://io.iosignal.net/ws');
