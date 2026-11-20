@@ -1,6 +1,6 @@
 # IOSignal WebRTC Lab
 
-공개 데모: **https://test.iosignal.net/webrtc/** (2026-10-18 배포).
+공개 데모: **https://lab.iosignal.net/webrtc/** (2026-11-20부터. 예전 주소 test.iosignal.net/webrtc/는 내려갔습니다).
 
 IOSignal을 WebRTC 시그널링 도구로 사용하는 **실제로 통화 가능한 1:1 화상채팅 예제**입니다. Vanilla JavaScript + Vite로 구현했으며, UI와 시그널링·미디어 코드를 `src/main.js`에서 함께 읽을 수 있습니다.
 
@@ -88,13 +88,11 @@ VITE_SIGNAL_URL=wss://io.iosignal.net/ws npm run build
 
 `base: './'`로 설정되어 같은 결과물을 도메인 루트나 `/webrtc/` 하위 경로에서 사용할 수 있습니다. 하위 경로는 마지막 `/`로 리다이렉트해야 상대 asset 경로가 정상 해석됩니다. 라우터 없이 URL fragment로 초대 정보를 보관합니다.
 
-| 방식 | 역할과 권장 순서 |
+| 위치 | 역할 |
 | --- | --- |
-| `iosignal-examples/iosignal_webrtc` | **소스의 기준 위치**. 다른 예제처럼 npm ci / npm run dev로 재현합니다. |
-| `test.iosignal.net/webrtc/` | **첫 공개 데모로 권장**. 기존 HTTPS 사이트 아래 dist를 배포하고 루트 페이지에 링크를 추가합니다. |
-| `webrtc.iosignal.net` | 고정 홍보 주소가 필요해질 때 같은 dist를 별도 호스트로 배포합니다. DNS·TLS·웹서버 설정이 추가됩니다. |
-
-이 셋은 택일이 아닙니다. 소스는 examples에 두고, 테스트 사이트의 하위 경로로 시작한 다음 필요하면 전용 도메인을 붙일 수 있습니다. 2026-10-18부터 `https://test.iosignal.net/webrtc/`에 배포합니다. 기존 서버의 `/home/ubuntu/sites/test_iosignal_net/webrtc/`에 정적 빌드를 배치하며 별도 DNS 변경은 필요하지 않습니다. 배포는 이 폴더를 원본으로 test_iosignal_net 저장소의 `./upload.sh webrtc`가 빌드해 올립니다(그 저장소에 두던 사본은 2026-11-16에 없앴습니다).
+| `iosignal-examples/iosignal_webrtc` | 소스. 다른 예제처럼 npm ci / npm run dev로 재현합니다. |
+| `lab.iosignal.net/webrtc/` | 공개 데모. 웹 예제 모음 사이트(lab.iosignal.net)의 하위 경로에 같은 dist를 배포합니다. |
+| 전용 도메인 | 고정 홍보 주소가 필요해지면 같은 dist를 별도 호스트로 배포할 수 있습니다. DNS·TLS·웹서버 설정이 추가됩니다. |
 
 HTTPS 정적 웹서버의 응답 헤더 권장값:
 
