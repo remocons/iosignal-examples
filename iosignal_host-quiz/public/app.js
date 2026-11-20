@@ -4,7 +4,10 @@ const TAGS = { IN: 'quiz#in', STATE: 'quiz#$state', YOU: '@quiz.you' };
 const LETTERS = ['A', 'B', 'C', 'D'];
 const $ = (id) => document.getElementById(id);
 
-const io = new IO(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`);
+// Relative to the page, so the quiz also works under a sub path behind a proxy (lab.iosignal.net/quiz/ -> /quiz/ws).
+const wsURL = new URL('ws', location.href);
+wsURL.protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+const io = new IO(wsURL.href);
 let state = null;
 let offset = 0;        // server clock - local clock, from state.now
 let joined = false;

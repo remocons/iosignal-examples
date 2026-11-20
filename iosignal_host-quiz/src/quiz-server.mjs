@@ -32,7 +32,7 @@ const MIME = {
 };
 
 /** dashboard: false, true or iosignal dashboard options. */
-export async function startQuiz({ port = 5181, log = console.log, game = new QuizGame(), dashboard = true } = {}) {
+export async function startQuiz({ port = 5181, listenHost, log = console.log, game = new QuizGame(), dashboard = true } = {}) {
   let ioServer;
   const httpServer = http.createServer(async (req, res) => {
     if (ioServer?.dashboard?.handle(req, res)) return; // /dashboard and /dashboard/io.js
@@ -64,7 +64,7 @@ export async function startQuiz({ port = 5181, log = console.log, game = new Qui
   const ready = new Promise((resolve) => ioServer.once('ready', resolve));
   await new Promise((resolve, reject) => {
     httpServer.once('error', reject);
-    httpServer.listen(port, resolve);
+    httpServer.listen(port, listenHost, resolve); // listenHost: undefined listens on every interface
   });
   await ready;
 
