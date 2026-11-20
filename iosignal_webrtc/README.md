@@ -25,7 +25,7 @@ npm run dev
 
 ## 화면 기능
 
-- 공유 채널명, fragment 기반 초대 링크, 로컬에서 생성하는 QR
+- 공유 채널명, fragment 기반 초대 링크, 로컬에서 생성하는 QR. 초대 QR과 링크는 「방 만들기」로 방을 연 뒤에만 보이고, 나가면 다시 숨습니다. 초대 링크로 연 화면은 「방 참여」를 강조하고 자기 초대는 보이지 않습니다.
 - 기본 서버 주소를 생략한 짧은 초대 링크(별도 서버는 포함), 160px QR 및 클릭/키보드로 여는 최대 320px 확대 화면
 - 내 영상 / 상대 영상, 상대 크게 / 내 화면 크게 / 나란히, 작은 화면 크기 슬라이더, 전체 화면
 - 마이크·카메라 on/off, 상대 음량·음소거, 브라우저 자동재생 차단 시 재생 버튼
@@ -50,7 +50,7 @@ subscribe(webrtc-lab-방)        채널 구독          subscribe(webrtc-lab-방
                    직접 연결 또는 TURN relay
 ```
 
-핵심 API는 `io.subscribe(channel)`, `io.signal(channel, message)`, `io.signal(peerCid + '@rtc', message)`, 채널용 `io.on('message', handler)`와 직접 메시지용 `io.on('@rtc', handler)`입니다. 실제 IOSignal 9.12.0 라이브러리를 사용합니다. 별도의 Socket.IO나 커스텀 WebSocket 시그널 프로토콜로 대체하지 않습니다.
+핵심 API는 `io.subscribe(channel)`, `io.signal(channel, message)`, `io.signal(peerCid + '@rtc', message)`, 채널용 `io.on('message', handler)`와 직접 메시지용 `io.on('@rtc', handler)`입니다. 실제 IOSignal 라이브러리(`iosignal/browser/esm/io.js`)를 사용합니다. 별도의 Socket.IO나 커스텀 WebSocket 시그널 프로토콜로 대체하지 않습니다.
 
 `#`로 시작하는 HOME CHANNEL 대신 일반 공개 채널(`webrtc-lab-...`)을 사용하므로 같은 네트워크에 묶이지 않습니다. CID 직접 메시지는 `message` 이벤트가 아닌 `@rtc` 이벤트로 수신합니다.
 

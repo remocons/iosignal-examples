@@ -77,11 +77,33 @@ test('camera permission denial leaves controls recoverable',async({browser})=>{
 });
 
 
-test('compact default invite, custom server roundtrip and QR enlargement', async ({page,context}) => {
+test('invite appears only for an open room: link, custom server roundtrip and QR enlargement', async ({page,context}) => {
   await page.goto('/');
   const defaultServer = await page.locator('#endpoint').inputValue();
   await page.locator('#room').fill('qr-short');
+  // Before a room is open there is no QR, only a hint.
+  await expect(page.locator('#share')).toBeHidden();
+  await expect(page.locator('#share-pending')).toBeVisible();
   await expect(page.locator('#invite')).toHaveValue(/#room=qr-short$/);
+  const recipient = await context.newPage();
+  await recipient.goto(await page.locator('#invite').inputValue());
+  await expect(recipient.locator('#endpoint')).toHaveValue(defaultServer);
+  await expect(recipient.locator('#room')).toHaveValue('qr-short');
+  // A page opened from an invite joins and shows no invite of its own.
+  await expect(recipient.locator('#share')).toBeHidden();
+  await expect(recipient.locator('#share-pending')).toContainText('방 참여');
+  await expect(recipient.locator('#join')).toHaveClass(/primary/);
+  await page.locator('#endpoint').fill('wss://custom.example/ws');
+  await expect(page.locator('#invite')).toHaveValue(/server=wss%3A%2F%2Fcustom.example%2Fws/);
+  const customRecipient = await context.newPage();
+  await customRecipient.goto(await page.locator('#invite').inputValue());
+  await expect(customRecipient.locator('#endpoint')).toHaveValue('wss://custom.example/ws');
+  await page.locator('#endpoint').fill(process.env.SIGNAL_TEST_URL || defaultServer);
+  await page.locator('#ice-settings').evaluate(e=>e.open=true);
+  await page.locator('#stun').fill('');
+  await page.locator('#host').click(); await expect(page.locator('#signal-state')).toHaveText('ready');
+  await expect(page.locator('#share')).toBeVisible();
+  await expect(page.locator('#share-pending')).toBeHidden();
   expect(await page.locator('#qr').evaluate(el=>el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(160);
   await page.locator('#qr-open').click();
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -89,18 +111,13 @@ test('compact default invite, custom server roundtrip and QR enlargement', async
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await expect(page.locator('#qr-open')).toBeFocused();
-  const recipient = await context.newPage();
-  await recipient.goto(await page.locator('#invite').inputValue());
-  await expect(recipient.locator('#endpoint')).toHaveValue(defaultServer);
-  await expect(recipient.locator('#room')).toHaveValue('qr-short');
-  await page.locator('#endpoint').fill('wss://custom.example/ws');
-  await expect(page.locator('#invite')).toHaveValue(/server=wss%3A%2F%2Fcustom.example%2Fws/);
-  const customRecipient = await context.newPage();
-  await customRecipient.goto(await page.locator('#invite').inputValue());
-  await expect(customRecipient.locator('#endpoint')).toHaveValue('wss://custom.example/ws');
   await page.setViewportSize({width:390,height:844});
   await page.locator('#qr-open').click();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.locator('#qr-close').click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
+  // Leaving the room hides the invite again.
+  await page.locator('#leave').click();
+  await expect(page.locator('#share')).toBeHidden();
+  await expect(page.locator('#share-pending')).toBeVisible();
 });

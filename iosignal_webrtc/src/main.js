@@ -1,10 +1,11 @@
-import IO from 'iosignal/io';
+import IO from 'iosignal/browser/esm/io.js';
 import QRCode from 'qrcode';
 import './style.css';
 
 const $ = id => document.getElementById(id);
 const uuid = () => crypto.randomUUID();
 const params = new URLSearchParams(location.hash.slice(1));
+const invited = params.has('room');
 const isLoopback = host => ['localhost', '127.0.0.1', '[::1]'].includes(host);
 $('room').value = params.get('room') || `lab-${uuid().slice(0, 8)}`;
 const defaultSignalUrl = import.meta.env.VITE_SIGNAL_URL || (import.meta.env.DEV ? `ws://${location.hostname}:7781` : 'wss://io.iosignal.net/ws');
@@ -23,6 +24,13 @@ function log(event, detail = '', error = false) {
   row.append(time, name, text); $('logs').append(row);
   if ($('logs').children.length > 300) $('logs').firstChild.remove();
   $('logs').scrollTop = $('logs').scrollHeight;
+}
+// The invite (QR, link) appears only while this page hosts an open room.
+function showInvite(open) { $('share').hidden = !open; $('share-pending').hidden = open; }
+if (invited) {
+  // Opened from an invite: this page joins; it does not invite anyone.
+  $('share-pending-text').textContent = '초대 링크로 열었습니다. 「방 참여」를 누르세요.';
+  $('join').classList.add('primary'); $('host').classList.remove('primary');
 }
 function notice(text) { $('notice').textContent = text; }
 function status(text, connected = false) { $('call-status').textContent = `● ${text}`; $('call-status').classList.toggle('connected', connected); }
@@ -114,7 +122,7 @@ async function begin(role) {
       s.io.subscribe(s.channel);
       log('io.ready', `CID ${s.io.cid} · 채널 ${s.channel}`);
       if (role === 'host') {
-        status('참여자 대기'); notice('방이 열렸습니다. 초대 링크를 다른 장치로 보내세요.');
+        status('참여자 대기'); notice('방이 열렸습니다. 초대 링크를 다른 장치로 보내세요.'); showInvite(true);
         send(s,'host');
       } else {
         status('방 탐색 중'); notice('개설자를 찾고 있습니다. 상대가 먼저 방을 만들어야 합니다.');
@@ -250,7 +258,7 @@ function finish(reason = '통화를 종료했습니다.', notify = true) {
   for(const [id,label] of [['mic','마이크'],['camera','카메라']]) { $(id).setAttribute('aria-pressed','false'); $(id).querySelector('span').textContent = `${label} 켜짐`; }
   $('signal-state').textContent = 'offline'; $('ice-state').textContent = 'closed';
   $('rtt').textContent = '—'; $('route').textContent = '—'; $('remote-id').textContent = '아직 연결되지 않음'; $('cid').textContent = 'LOCAL CID —'; $('play').hidden = true;
-  lock(false); status('대기 중'); notice(reason); log('session.end',reason);
+  lock(false); showInvite(false); status('대기 중'); notice(reason); log('session.end',reason);
 }
 $('host').onclick = () => begin('host'); $('join').onclick = () => begin('guest'); $('leave').onclick = () => finish();
 for(const [id,kind,label] of [['mic','audio','마이크'],['camera','video','카메라']]) $(id).onclick = () => {
@@ -274,5 +282,5 @@ $('clear').onclick = () => { logs.length=0; $('logs').replaceChildren(); };
 $('export').onclick = () => { const url = URL.createObjectURL(new Blob([JSON.stringify(logs,null,2)],{type:'application/json'})); const link=document.createElement('a');link.href=url;link.download='iosignal-webrtc-log.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000); };
 window.addEventListener('pagehide',()=>finish());
 if(import.meta.hot) import.meta.hot.dispose(()=>finish());
-log('lab.ready','IOSignal 9.12.0 · WebRTC · 1:1 audio/video');
+log('lab.ready',`IOSignal ${IO.version} · WebRTC · 1:1 audio/video`);
 updateInvite().catch(()=>log('qr.error','QR 생성 실패',true));
