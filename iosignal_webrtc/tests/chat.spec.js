@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-for (const [name, port] of [['React',5173],['Svelte',5174],['Vanilla',5175],['CDN',5176]]) {
+for (const [name, port] of [['React',5173],['Svelte',5174],['Vanilla',5175],['CDN',5176],['Vue',5177]]) {
   test(`${name}: two clients exchange messages and reconnect`, async ({browser}) => {
     const a = await browser.newPage(); const b = await browser.newPage();
     const errors=[]; a.on('pageerror',e=>errors.push(e.message)); b.on('pageerror',e=>errors.push(e.message));

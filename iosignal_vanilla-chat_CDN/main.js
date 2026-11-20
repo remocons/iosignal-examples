@@ -1,15 +1,13 @@
-import IO from "https://cdn.jsdelivr.net/npm/iosignal@9.12.0/dist/browser/esm/io.js"
+import IO from 'https://cdn.jsdelivr.net/npm/iosignal@9.23.0/dist/browser/esm/io.js';
 
-const url = 'ws://localhost:7780';
+// A build can choose another server: VITE_SIGNAL_URL=wss://io.iosignal.net/ws npm run build
+const url = import.meta.env?.VITE_SIGNAL_URL || 'ws://localhost:7780';
 const channel_tag = 'openchat';
 
-// Get DOM elements
 const urlDisplay = document.getElementById('url');
 const channelDisplay = document.getElementById('channel');
 const ioStateDisplay = document.getElementById('io-state');
 const cidDisplay = document.getElementById('cid');
-const instancesDisplay = document.getElementById('io-instances');
-const websocketsDisplay = document.getElementById('ws-created');
 const messagesContainer = document.getElementById('messages');
 const messageInput = document.getElementById('input');
 const sendButton = document.getElementById('send-button');
@@ -17,60 +15,43 @@ messageInput.value = 'Hello, World';
 
 let io = null;
 
-const scrollToBottom = () => {
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-};
-
-const updateIoCounts = () => {
-    instancesDisplay.textContent = IO.instanceCount;
-    websocketsDisplay.textContent = IO.webSocketCount;
+const setReady = (ready) => {
+    sendButton.disabled = !ready;
+    messageInput.disabled = !ready;
 };
 
 const handleReady = () => {
-    console.log('ready cid:', io.cid);
     cidDisplay.textContent = io.cid;
-    io.subscribe(channel_tag);
-    ioStateDisplay.textContent = 'ready';
-    ioStateDisplay.style.color = 'green';
-    sendButton.disabled = false;
-    messageInput.disabled = false;
-    updateIoCounts();
+    io.subscribe(channel_tag); // A manual subscription lasts for one connection: repeat it on every ready.
 };
 
 const handleChange = (state) => {
-    console.log('IO state changed to:', state);
     ioStateDisplay.textContent = state;
     ioStateDisplay.style.color = state === 'ready' ? 'green' : 'red';
-    sendButton.disabled = state !== 'ready';
-    messageInput.disabled = state !== 'ready';
-    updateIoCounts();
+    setReady(state === 'ready');
 };
 
-const handleChannelMessage = (tag, msgObj) => {
-    if( tag == channel_tag && msgObj){
-        if (typeof msgObj === 'string') {
-            msgObj = { text: msgObj, cid: 'cid unknown' };
-        }
-        const messageElement = document.createElement('div');
-        messageElement.textContent = `${msgObj.cid} : ${msgObj.text}`;
-        messagesContainer.appendChild(messageElement);
-        scrollToBottom();
-    }
+// msg.cid is written by the sender, not checked by the server.
+const handleChannelMessage = (tag, msg) => {
+    if (tag !== channel_tag || !msg) return;
+    // A plain string (for example from a CLI) has no sender field.
+    const { cid = '?', text = msg } = typeof msg === 'string' ? {} : msg;
+    const messageElement = document.createElement('div');
+    messageElement.textContent = `${cid} : ${text}`;
+    messagesContainer.appendChild(messageElement);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
 };
 
 const handleError = (error) => {
-    console.error('IO Error:', error);
     ioStateDisplay.textContent = `Error: ${error.message}`;
     ioStateDisplay.style.color = 'red';
-    sendButton.disabled = true;
-    messageInput.disabled = true;
+    setReady(false);
 };
 
 const sendMessage = () => {
-    const inputText = messageInput.value.trim();
-    if (inputText && io?.stateName === 'ready') {
-        const msgObj = { text: inputText, cid: io.cid };
-        io.signal(channel_tag, msgObj);
+    const text = messageInput.value.trim();
+    if (text && io?.stateName === 'ready') {
+        io.signal(channel_tag, { text, cid: io.cid });
         messageInput.value = '';
     }
 };
@@ -88,17 +69,14 @@ function initialize() {
     io.on('message', handleChannelMessage);
     io.on('error', handleError);
     io.open(url);
-    updateIoCounts();
     sendButton.addEventListener('click', sendMessage);
     messageInput.addEventListener('keyup', handleKeyUp);
 }
 
 function cleanup() {
-    document.removeEventListener('DOMContentLoaded', initialize);
     sendButton.removeEventListener('click', sendMessage);
     messageInput.removeEventListener('keyup', handleKeyUp);
-    window.removeEventListener('beforeunload', cleanup);
-    io?.destroy(); // destroy() removes the IO event listeners as well.
+    io?.destroy(); // destroy() also removes the IO event listeners.
     io = null;
 }
 
@@ -108,5 +86,5 @@ if (document.readyState === 'loading') {
 } else {
     initialize();
 }
-window.addEventListener('beforeunload', cleanup);
+window.addEventListener('beforeunload', cleanup, { once: true });
 if (import.meta.hot) import.meta.hot.dispose(cleanup);

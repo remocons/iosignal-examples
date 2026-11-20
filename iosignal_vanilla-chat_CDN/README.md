@@ -15,7 +15,7 @@ npm run dev
 
 이미 이 예제 폴더를 VS Code로 열었다면 `cd` 명령은 생략합니다. `npm start`도 같은 개발 서버를 실행합니다.
 
-CDN 예제도 서버 실행을 위해 `npm ci`이 필요합니다. 브라우저 클라이언트는 jsDelivr의 IOSignal 9.12.0을 불러오므로 인터넷 연결이 필요합니다.
+CDN 예제도 서버 실행을 위해 `npm ci`이 필요합니다. 브라우저 클라이언트는 jsDelivr에서 IOSignal을 불러오므로(버전은 `main.js`의 주소에 있음) 인터넷 연결이 필요합니다.
 
 ## Vite가 실행하는 두 서버
 
@@ -63,6 +63,22 @@ npm run preview
 preview가 터미널에 출력하는 웹 주소를 두 탭에서 엽니다. `server.js`는 개발 서버와 같은 IOSignal 포트를 사용하며 `Ctrl+C`로 종료합니다. 포트를 직접 변경할 때는 `server.js`도 맞춰주세요.
 
 실제 배포에서는 IOSignal 서버를 별도로 운영하고 클라이언트 URL을 해당 주소로 수정해야 합니다. 기본 `localhost`는 같은 컴퓨터에서 테스트하는 주소이며, HTTPS 페이지에는 `wss://`를 사용합니다.
+
+## 구독 방식
+
+이 예제는 `ready` 이벤트마다 `subscribe()`를 부르는 수동 방식입니다. 수동 구독은 그 연결에만 적용되므로 재접속하면 `ready`에서 다시 구독합니다. IOSignal에는 구독하는 방법이 셋 있고, 용도에 맞게 고릅니다.
+
+| 방식 | 맞는 경우 |
+|---|---|
+| `ready`에서 `subscribe(tag)` | 연결 상태에 따라 처리하거나, 실행 중에 구독을 바꿀 때 |
+| `listen(tag, handler)` | 태그가 정해져 있고, IO를 만든 코드가 `open()` 전에 한 번 등록할 때. 재접속하면 라이브러리가 다시 구독합니다. 이미 `ready`인 IO에 나중에 등록하면 다음 재접속까지 구독되지 않습니다. |
+| `link(component, tag, handler)`, `unlinkAll(component)` | 여러 컴포넌트가 IO 하나를 함께 쓸 때. `ready`면 바로 구독하고, 컴포넌트가 사라질 때 그 컴포넌트의 구독만 정리합니다. |
+
+자세한 내용은 [JS 클라이언트: 구독과 컴포넌트 수명주기](https://iosignal.net/docs/guides/subscriptions)에 있습니다.
+
+## 보낸 사람 표시
+
+화면의 CID는 보내는 쪽이 메시지에 직접 적은 값이고, 서버는 확인하지 않습니다(채널은 이름을 아는 누구나 보낼 수 있습니다). 시험용 예제라 그대로 둡니다. 서버가 확인한 보낸 사람이 필요하면 `server.host()`를 씁니다. 서버 안의 호스트는 메시지마다 서버가 확인한 보낸 사람 CID(`from.cid`)를 받습니다. [서버 안의 게임 로직](https://iosignal.net/docs/server/game-host)과 [Host Quiz 예제](../iosignal_host-quiz/README.md)를 참고하세요.
 
 ## 예제 범위
 

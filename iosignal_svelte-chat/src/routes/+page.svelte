@@ -1,84 +1,55 @@
 <script>
-  import { dev } from "$app/environment";
   import { onMount, tick } from "svelte";
   import IO from "iosignal/browser/esm/io.js";
 
-  // const url = 'ws://192.168.0.15:7778';
-  // const url = "wss://io.iosignal.net/ws";
-  const url = "ws://localhost:7778";
+  // A build can choose another server: VITE_SIGNAL_URL=wss://io.iosignal.net/ws npm run build
+  const url = import.meta.env.VITE_SIGNAL_URL || "ws://localhost:7778";
   const channel_tag = "openchat";
 
   let messages = $state([]);
   let input = $state("Hello, World!");
   let ioState = $state(null);
   let cid = $state(null);
-  let counts = $state({ instances: 0, websockets: 0 });
   let io = null;
   let messagesEnd;
+  let nextId = 0;
 
-  const scrollToBottom = () => {
-    messagesEnd?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  // This page owns its IO: create it on mount and destroy it on unmount.
   onMount(() => {
-
     io = new IO();
-    if (dev)
-      console.log("new io:", IO.version, IO.instanceCount, IO.webSocketCount);
 
-    counts = { instances: IO.instanceCount, websockets: IO.webSocketCount };
-
-    const handleReady = () => {
-      console.log("ready cid:", io.cid);
+    io.on("ready", () => {
       cid = io.cid;
-      io.subscribe(channel_tag);
-    };
-
-    const handleChange = (state) => {
-      ioState = state;
-      counts = { instances: IO.instanceCount, websockets: IO.webSocketCount };
-    };
-
-    const handleChannelMessage = async (tag, msgObj ) => {
-      if( tag == channel_tag && msgObj){
-        if( typeof msgObj === 'string' ) {
-          msgObj = { text: msgObj, cid: 'cid unknown' }; // Convert string to object if necessary
-        }
-        messages = [...messages, `${msgObj.cid} : ${msgObj.text}`];
-        await tick();
-        scrollToBottom();
-      }
-    };
-
-    const handleError = (error) => {
-      console.error("IO Error in App:", error);
-      ioState = `Error: ${error.message}`;
-    };
-
-    io.on("ready", handleReady);
-    io.on("change", handleChange);
-    io.on("message", handleChannelMessage);
-    io.on("error", handleError);
-
+      io.subscribe(channel_tag); // A manual subscription lasts for one connection: repeat it on every ready.
+    });
+    io.on("change", (state) => (ioState = state));
+    // msg.cid is written by the sender, not checked by the server.
+    io.on("message", async (tag, msg) => {
+      if (tag !== channel_tag || !msg) return;
+      // A plain string (for example from a CLI) has no sender field.
+      const { cid = "?", text = msg } = typeof msg === "string" ? {} : msg;
+      messages.push({ id: nextId++, cid, text });
+      await tick();
+      messagesEnd?.scrollIntoView({ behavior: "smooth" });
+    });
+    io.on("error", (error) => (ioState = `Error: ${error.message}`));
     io.open(url);
 
     return () => {
-      io.destroy();
+      io.destroy(); // destroy() also removes the IO event listeners.
       io = null;
     };
   });
 
   const sendMessage = () => {
-    if (input.trim() && io?.stateName === 'ready') {
-      const msgObj = { text: input, cid: io.cid };
-      io.signal(channel_tag, msgObj);
-      input = ''
+    const text = input.trim();
+    if (text && io?.stateName === "ready") {
+      io.signal(channel_tag, { text, cid: io.cid });
+      input = "";
     }
   };
 
-  let ioStateStyle = $derived(
-    `color: ${ioState === "ready" ? "green" : "red"}; font-weight: bold;`,
-  );
+  let ready = $derived(ioState === "ready");
 </script>
 
 <svelte:head><title>IOSignal Svelte Chat</title></svelte:head>
@@ -87,13 +58,11 @@
   <h1>IOSignal Svelte 5 Chat Example</h1>
   <div>URL: {url}</div>
   <div>Channel: {channel_tag}</div>
-  <div>IO State: <span style={ioStateStyle} role="status">{ioState}</span></div>
+  <div>IO State: <span style="color: {ready ? 'green' : 'red'}; font-weight: bold;" role="status">{ioState}</span></div>
   <div>Client ID: {cid}</div>
-  <div>IO Instances: {counts.instances}</div>
-  <div>WebSockets Created: {counts.websockets}</div>
   <div class="messages" role="log" aria-label="Chat messages">
-    {#each messages as msg, index (index)}
-      <div>{msg}</div>
+    {#each messages as msg (msg.id)}
+      <div>{msg.cid} : {msg.text}</div>
     {/each}
     <div bind:this={messagesEnd} aria-hidden="true"></div>
   </div>
@@ -103,9 +72,9 @@
       type="text"
       bind:value={input}
       onkeyup={(e) => e.key === "Enter" && sendMessage()}
-      disabled={ioState !== "ready"}
+      disabled={!ready}
     />
-    <button onclick={sendMessage} disabled={ioState !== "ready"}> Send </button>
+    <button onclick={sendMessage} disabled={!ready}> Send </button>
   </div>
 </div>
 
