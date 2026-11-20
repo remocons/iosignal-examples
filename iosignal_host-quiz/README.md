@@ -1,6 +1,6 @@
 # IOSignal Host Quiz — 서버가 채점하는 실시간 퀴즈
 
-[IOSignal](https://iosignal.net) 9.13.0부터 쓸 수 있는 `server.host()`로 만든 예제입니다. `server.host()` 설명은 [서버 안의 게임 로직](https://iosignal.net/docs/server/game-host)에 있습니다. 문제 진행과 채점을 **IOSignal 서버 안의 호스트**가 맡고, 브라우저는 답만 보냅니다.
+[IOSignal](https://iosignal.net) 9.13.0부터 쓸 수 있는 `server.host()`로 만든 예제입니다. `server.host()` 설명은 [서버 안의 게임 로직](https://docs.iosignal.net/docs/server/game-host)에 있습니다. 문제 진행과 채점을 **IOSignal 서버 안의 호스트**가 맡고, 브라우저는 답만 보냅니다.
 
 - 호스트는 답마다 **서버가 확인한 보낸 사람**(`from.cid`)을 함께 받습니다. 페이로드에 다른 사람의 CID를 넣어도 소용이 없습니다.
 - 점수판(`quiz#$state`)과 개인 결과(`@quiz.you`)는 **호스트만 보낼 수 있습니다.** 클라이언트가 같은 태그로 보내면 서버가 버립니다.

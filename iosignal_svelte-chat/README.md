@@ -72,11 +72,11 @@ preview가 터미널에 출력하는 웹 주소를 두 탭에서 엽니다. `ser
 | `listen(tag, handler)` | 태그가 정해져 있고, IO를 만든 코드가 `open()` 전에 한 번 등록할 때. 재접속하면 라이브러리가 다시 구독합니다. 이미 `ready`인 IO에 나중에 등록하면 다음 재접속까지 구독되지 않습니다. |
 | `link(component, tag, handler)`, `unlinkAll(component)` | 여러 컴포넌트가 IO 하나를 함께 쓸 때. `ready`면 바로 구독하고, 컴포넌트가 사라질 때 그 컴포넌트의 구독만 정리합니다. |
 
-Svelte 예제는 페이지가 `onMount`에서 IO를 직접 만들고 정리할 때 `destroy()`합니다. 이렇게 IO를 직접 가진 컴포넌트는 `listen()`도 쓸 수 있습니다. 앱 전체가 IO 하나를 함께 쓰면 컴포넌트에서는 `link()`와 `unlinkAll()`을 씁니다. 자세한 내용은 [JS 클라이언트: 구독과 컴포넌트 수명주기](https://iosignal.net/docs/guides/subscriptions)에 있습니다.
+Svelte 예제는 페이지가 `onMount`에서 IO를 직접 만들고 정리할 때 `destroy()`합니다. 이렇게 IO를 직접 가진 컴포넌트는 `listen()`도 쓸 수 있습니다. 앱 전체가 IO 하나를 함께 쓰면 컴포넌트에서는 `link()`와 `unlinkAll()`을 씁니다. 자세한 내용은 [JS 클라이언트: 구독과 컴포넌트 수명주기](https://docs.iosignal.net/docs/guides/subscriptions)에 있습니다.
 
 ## 보낸 사람 표시
 
-화면의 CID는 보내는 쪽이 메시지에 직접 적은 값이고, 서버는 확인하지 않습니다(채널은 이름을 아는 누구나 보낼 수 있습니다). 시험용 예제라 그대로 둡니다. 서버가 확인한 보낸 사람이 필요하면 `server.host()`를 씁니다. 서버 안의 호스트는 메시지마다 서버가 확인한 보낸 사람 CID(`from.cid`)를 받습니다. [서버 안의 게임 로직](https://iosignal.net/docs/server/game-host)과 [Host Quiz 예제](../iosignal_host-quiz/README.md)를 참고하세요.
+화면의 CID는 보내는 쪽이 메시지에 직접 적은 값이고, 서버는 확인하지 않습니다(채널은 이름을 아는 누구나 보낼 수 있습니다). 시험용 예제라 그대로 둡니다. 서버가 확인한 보낸 사람이 필요하면 `server.host()`를 씁니다. 서버 안의 호스트는 메시지마다 서버가 확인한 보낸 사람 CID(`from.cid`)를 받습니다. [서버 안의 게임 로직](https://docs.iosignal.net/docs/server/game-host)과 [Host Quiz 예제](../iosignal_host-quiz/README.md)를 참고하세요.
 
 ## 예제 범위
 
