@@ -68,3 +68,9 @@ h1 {
   margin-bottom: 8px;
   font-size: 14px;
 }
+
+.site-footer {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #666;
+}
