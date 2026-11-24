@@ -18,7 +18,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "iosignal": "9.23.0"
+    "iosignal": "10.0.0"
   },
   "engines": {
     "node": ">=22.16.0"

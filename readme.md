@@ -129,6 +129,8 @@ React의 effect, Vue의 onMounted·onBeforeUnmount, Svelte의 onMount, Vanilla�
 
 2026-11-09 (9.6.0): 같은 범위(5개 예제 빌드, 채팅 4종 양방향 송수신·재접속(CDN 포함), WebRTC 통합 테스트 5개)가 로컬 Chrome에서 통과했습니다. 예제 코드는 수동 `subscribe()`를 `ready` 상태에서만 호출하므로 9.6.0의 새 호출 시점 검사로 바뀐 코드는 없습니다.
 
+2026-11-24 (10.0.0): 모든 예제를 iosignal 10.0.0으로 올렸습니다(CDN 주소 포함). 10.0.0은 로그인·암호화를 표준 Ascon으로 바꾼 메이저 판이며, 예제는 익명 연결이라 코드는 바뀌지 않았습니다. 채팅 5종 브라우저 시험(`npm run test:chats`), WebRTC 시험 5개, Host Quiz `npm test` 5개, 예제 7개 빌드가 통과했습니다.
+
 2026-11-21: 모든 예제를 iosignal 9.23.0으로 올렸습니다. 채팅 5종 브라우저 시험(`npm run test:chats`), WebRTC 시험 5개, Host Quiz `npm test` 5개가 통과했습니다(React는 7777 포트를 다른 프로그램이 써서 임시로 7787 포트에서 시험).
 
 2026-11-20: 채널 협상 채팅 데모 예제를 뺐습니다. 채팅 4종에서 디버그 표시(IO 인스턴스·WebSocket 수)와 템플릿 파일을 지우고 README에 구독 방식과 보낸 사람 표시를 적었으며, CDN 주소를 9.23.0으로 올렸습니다. Vue 3 채팅 예제(`iosignal_vue-chat`)를 더했습니다. `npm run test:chats` 5개(두 클라이언트 양방향 송수신, 재접속)가 통과했습니다. React는 7777 포트를 다른 프로그램이 써서 임시로 7787 포트에서 시험했습니다.

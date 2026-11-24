@@ -1,4 +1,4 @@
-import IO from 'https://cdn.jsdelivr.net/npm/iosignal@9.23.0/dist/browser/esm/io.js';
+import IO from 'https://cdn.jsdelivr.net/npm/iosignal@10.0.0/dist/browser/esm/io.js';
 
 // A build can choose another server: VITE_SIGNAL_URL=wss://io.iosignal.net/ws npm run build
 const url = import.meta.env?.VITE_SIGNAL_URL || 'ws://localhost:7780';

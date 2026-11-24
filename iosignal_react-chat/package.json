@@ -14,7 +14,7 @@
     "startCommand": "npm run sb:start"
   },
   "dependencies": {
-    "iosignal": "9.23.0",
+    "iosignal": "10.0.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"
   },
