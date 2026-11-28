@@ -3,7 +3,7 @@
 IOSignal을 React, Vue 3, Svelte 5, Vanilla JavaScript 환경에서 사용하는 채팅·WebRTC 화상통화 예제와, 서버가 판정하는 게임 예제(`server.host`) 모음입니다. 각 폴더는 독립적으로 설치하고 실행할 수 있습니다.
 
 <p align="center">
-  <img src="docs/assets/iosignal-ecosystem.png" alt="IOSignal로 연결되는 서버, CLI, Node.js, Arduino와 원격 제어 웹앱" width="720" />
+  <img src="docs/assets/iosignal-ecosystem.png" alt="IOSignal로 연결되는 서버, CLI, Node.js, Arduino, Python과 원격 제어 웹앱" width="720" />
 </p>
 
 ## 예제와 기본 포트
@@ -128,8 +128,6 @@ React의 effect, Vue의 onMounted·onBeforeUnmount, Svelte의 onMount, Vanilla�
 2026-11-12 (9.12.0): 5개 예제 빌드, WebRTC 통합 테스트 5개가 통과했습니다. 채팅 4종 브라우저 테스트(`npm run test:chats`)는 로컬 7777 포트를 다른 서버가 쓰고 있어 이번에는 실행하지 못했습니다. 9.12.0은 클라이언트 API 변경이 없습니다.
 
 2026-11-09 (9.6.0): 같은 범위(5개 예제 빌드, 채팅 4종 양방향 송수신·재접속(CDN 포함), WebRTC 통합 테스트 5개)가 로컬 Chrome에서 통과했습니다. 예제 코드는 수동 `subscribe()`를 `ready` 상태에서만 호출하므로 9.6.0의 새 호출 시점 검사로 바뀐 코드는 없습니다.
-
-2026-11-24 (10.0.0): 모든 예제를 iosignal 10.0.0으로 올렸습니다(CDN 주소 포함). 10.0.0은 로그인·암호화를 표준 Ascon으로 바꾼 메이저 판이며, 예제는 익명 연결이라 코드는 바뀌지 않았습니다. 채팅 5종 브라우저 시험(`npm run test:chats`), WebRTC 시험 5개, Host Quiz `npm test` 5개, 예제 7개 빌드가 통과했습니다.
 
 2026-11-21: 모든 예제를 iosignal 9.23.0으로 올렸습니다. 채팅 5종 브라우저 시험(`npm run test:chats`), WebRTC 시험 5개, Host Quiz `npm test` 5개가 통과했습니다(React는 7777 포트를 다른 프로그램이 써서 임시로 7787 포트에서 시험).
 
